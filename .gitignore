@@ -1,0 +1,9 @@
+# Raw dictionary sources (large, re-downloadable via build_dictionary.py)
+data-pipeline/sources/
+data-pipeline/output/
+
+# Xcode
+KanjiScanner/KanjiScanner.xcodeproj/xcuserdata/
+KanjiScanner/KanjiScanner.xcodeproj/project.xcworkspace/xcuserdata/
+KanjiScanner/DerivedData/
+.DS_Store

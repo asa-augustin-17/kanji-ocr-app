@@ -1,0 +1,590 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01ECE8991836657D2F54CCF6 /* Segmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F29F4E37EFBAA5F2B86F105 /* Segmenter.swift */; };
+		08EB1FE5D11344AD6EF36FF3 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */; };
+		2A1F7BAC92A59CE63D7AB541 /* PermissionDeniedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */; };
+		393CD31DB6618C11B2CEB259 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */; };
+		750E2DDED34E69E39D162107 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7169AF8DF1832B6C827BC53 /* Models.swift */; };
+		761066107619107F25FCD7BB /* TextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */; };
+		78934D77BB88DE03C87B87AF /* TokenBoxBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */; };
+		7AA13CAB24B35AB3ADB43174 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6C5AFA0C39B35F111B767E /* ResultsView.swift */; };
+		862306F61243A6927DC8B5DC /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0343FD23611274B4601967E /* RootView.swift */; };
+		AEC3F94CDCF6693D8C7C78A3 /* KanjiScannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157D0EF68C08D724061A47BE /* KanjiScannerApp.swift */; };
+		BEB42108C62C54FDB69B2E02 /* SegmenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */; };
+		C01B92AF60F4FA2067DB5808 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = B28E88076FAC7B4AC27F9E7E /* GRDB */; };
+		C4C43D9E04AEC0355A1AADE8 /* kanji_scanner.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = E394D704EF5228328C4C9CC2 /* kanji_scanner.sqlite */; };
+		C66B59A1DEF54DF36B4433BB /* TestDictionaryFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */; };
+		D5FA30D2A64F3CB3D4FEFBC6 /* DictionaryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45D88B319AEB9DA143D1CF2E /* DictionaryDatabase.swift */; };
+		E2858D11DB24AD8A55BF263F /* DictionaryDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */; };
+		E32D7E55A542DBB32D37DE91 /* NoMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA12BACDE9A854F802AF30A7 /* NoMatchView.swift */; };
+		EEC88AFD452E821B0C73DFA1 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E9E5ADAA28DF77EB0F1252 /* CameraView.swift */; };
+		F5725C495A58B167D03A0DA3 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = AE63BD958A5116A591493385 /* GRDB */; };
+		FF4BA8A50B12764181FA7A4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42C7E0169556D3147BC8A513 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CEAA9E27768A909553237912 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2D6765F2A1E1CB4A5A132435 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0DD9EEA1E6A5E89205C9405C;
+			remoteInfo = KanjiScanner;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDictionaryFactory.swift; sourceTree = "<group>"; };
+		0F29F4E37EFBAA5F2B86F105 /* Segmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmenter.swift; sourceTree = "<group>"; };
+		1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmenterTests.swift; sourceTree = "<group>"; };
+		157D0EF68C08D724061A47BE /* KanjiScannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiScannerApp.swift; sourceTree = "<group>"; };
+		2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenBoxBuilder.swift; sourceTree = "<group>"; };
+		42C7E0169556D3147BC8A513 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		45D88B319AEB9DA143D1CF2E /* DictionaryDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDatabase.swift; sourceTree = "<group>"; };
+		54F859F9E9335A74404A0112 /* KanjiScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KanjiScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7ADB20D9F21C479878FFC009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8E6C5AFA0C39B35F111B767E /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
+		91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDatabaseTests.swift; sourceTree = "<group>"; };
+		A7169AF8DF1832B6C827BC53 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		BC4F04992C727363A23DB12D /* KanjiScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KanjiScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlayView.swift; sourceTree = "<group>"; };
+		E0343FD23611274B4601967E /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		E394D704EF5228328C4C9CC2 /* kanji_scanner.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = kanji_scanner.sqlite; sourceTree = "<group>"; };
+		E5E9E5ADAA28DF77EB0F1252 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRecognizer.swift; sourceTree = "<group>"; };
+		FA12BACDE9A854F802AF30A7 /* NoMatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoMatchView.swift; sourceTree = "<group>"; };
+		FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionDeniedView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5BCBF46EE34E537B34AFAF9D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5725C495A58B167D03A0DA3 /* GRDB in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F99F5350A33C53E559BB5E63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C01B92AF60F4FA2067DB5808 /* GRDB in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2021DF04705D6C011E62DAD1 /* Results */ = {
+			isa = PBXGroup;
+			children = (
+				FA12BACDE9A854F802AF30A7 /* NoMatchView.swift */,
+				8E6C5AFA0C39B35F111B767E /* ResultsView.swift */,
+			);
+			path = Results;
+			sourceTree = "<group>";
+		};
+		209E779EE373DCE7EF8EB2A0 /* KanjiScanner */ = {
+			isa = PBXGroup;
+			children = (
+				42C7E0169556D3147BC8A513 /* Assets.xcassets */,
+				7ADB20D9F21C479878FFC009 /* Info.plist */,
+				2AECCA2A68C216124265E877 /* App */,
+				DAD0926327A2E389B7B65D53 /* Camera */,
+				D250ED60A7335095BBA33DF5 /* Dictionary */,
+				B7474F00175BF9863F998682 /* OCR */,
+				7670EA35F1368086D0F84FDF /* Resources */,
+				2021DF04705D6C011E62DAD1 /* Results */,
+				E29250950FE2A2082003D2E7 /* Scan */,
+				340CD874BFDB8AD04A914DA6 /* Segmentation */,
+			);
+			path = KanjiScanner;
+			sourceTree = "<group>";
+		};
+		2AECCA2A68C216124265E877 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				157D0EF68C08D724061A47BE /* KanjiScannerApp.swift */,
+				E0343FD23611274B4601967E /* RootView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		340CD874BFDB8AD04A914DA6 /* Segmentation */ = {
+			isa = PBXGroup;
+			children = (
+				0F29F4E37EFBAA5F2B86F105 /* Segmenter.swift */,
+			);
+			path = Segmentation;
+			sourceTree = "<group>";
+		};
+		34EDC1E8BEFD0D09D8693454 /* KanjiScannerTests */ = {
+			isa = PBXGroup;
+			children = (
+				91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */,
+				1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */,
+				0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */,
+			);
+			path = KanjiScannerTests;
+			sourceTree = "<group>";
+		};
+		5496B9DBC79F6062FBEBB481 = {
+			isa = PBXGroup;
+			children = (
+				209E779EE373DCE7EF8EB2A0 /* KanjiScanner */,
+				34EDC1E8BEFD0D09D8693454 /* KanjiScannerTests */,
+				B08D03E43852B22B5D8031B9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7670EA35F1368086D0F84FDF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E394D704EF5228328C4C9CC2 /* kanji_scanner.sqlite */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B08D03E43852B22B5D8031B9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BC4F04992C727363A23DB12D /* KanjiScanner.app */,
+				54F859F9E9335A74404A0112 /* KanjiScannerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B7474F00175BF9863F998682 /* OCR */ = {
+			isa = PBXGroup;
+			children = (
+				F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */,
+				2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */,
+			);
+			path = OCR;
+			sourceTree = "<group>";
+		};
+		D250ED60A7335095BBA33DF5 /* Dictionary */ = {
+			isa = PBXGroup;
+			children = (
+				45D88B319AEB9DA143D1CF2E /* DictionaryDatabase.swift */,
+				A7169AF8DF1832B6C827BC53 /* Models.swift */,
+			);
+			path = Dictionary;
+			sourceTree = "<group>";
+		};
+		DAD0926327A2E389B7B65D53 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				E5E9E5ADAA28DF77EB0F1252 /* CameraView.swift */,
+				B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */,
+				FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		E29250950FE2A2082003D2E7 /* Scan */ = {
+			isa = PBXGroup;
+			children = (
+				D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */,
+			);
+			path = Scan;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0DD9EEA1E6A5E89205C9405C /* KanjiScanner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 25B2B51F3CC4238DA2F2F0E4 /* Build configuration list for PBXNativeTarget "KanjiScanner" */;
+			buildPhases = (
+				2F8CA22F17568A3A2CF46BF7 /* Sources */,
+				FFB2F6C64307AEC6AAB7F8E4 /* Resources */,
+				5BCBF46EE34E537B34AFAF9D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KanjiScanner;
+			packageProductDependencies = (
+				AE63BD958A5116A591493385 /* GRDB */,
+			);
+			productName = KanjiScanner;
+			productReference = BC4F04992C727363A23DB12D /* KanjiScanner.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A1371A54C0B1F9D6E277BF60 /* KanjiScannerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D316C7BB19D1E039F2FCF8B4 /* Build configuration list for PBXNativeTarget "KanjiScannerTests" */;
+			buildPhases = (
+				ACCADB7CBCC14C18BADC4F17 /* Sources */,
+				F99F5350A33C53E559BB5E63 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3133C8E56E2D865E7135FD20 /* PBXTargetDependency */,
+			);
+			name = KanjiScannerTests;
+			packageProductDependencies = (
+				B28E88076FAC7B4AC27F9E7E /* GRDB */,
+			);
+			productName = KanjiScannerTests;
+			productReference = 54F859F9E9335A74404A0112 /* KanjiScannerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2D6765F2A1E1CB4A5A132435 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2650;
+			};
+			buildConfigurationList = 72470221094C30FB3599A34B /* Build configuration list for PBXProject "KanjiScanner" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 5496B9DBC79F6062FBEBB481;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7996FA4421B2991E832A2289 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B08D03E43852B22B5D8031B9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0DD9EEA1E6A5E89205C9405C /* KanjiScanner */,
+				A1371A54C0B1F9D6E277BF60 /* KanjiScannerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FFB2F6C64307AEC6AAB7F8E4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF4BA8A50B12764181FA7A4A /* Assets.xcassets in Resources */,
+				C4C43D9E04AEC0355A1AADE8 /* kanji_scanner.sqlite in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2F8CA22F17568A3A2CF46BF7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EEC88AFD452E821B0C73DFA1 /* CameraView.swift in Sources */,
+				08EB1FE5D11344AD6EF36FF3 /* CameraViewModel.swift in Sources */,
+				D5FA30D2A64F3CB3D4FEFBC6 /* DictionaryDatabase.swift in Sources */,
+				AEC3F94CDCF6693D8C7C78A3 /* KanjiScannerApp.swift in Sources */,
+				750E2DDED34E69E39D162107 /* Models.swift in Sources */,
+				E32D7E55A542DBB32D37DE91 /* NoMatchView.swift in Sources */,
+				2A1F7BAC92A59CE63D7AB541 /* PermissionDeniedView.swift in Sources */,
+				7AA13CAB24B35AB3ADB43174 /* ResultsView.swift in Sources */,
+				862306F61243A6927DC8B5DC /* RootView.swift in Sources */,
+				393CD31DB6618C11B2CEB259 /* ScanOverlayView.swift in Sources */,
+				01ECE8991836657D2F54CCF6 /* Segmenter.swift in Sources */,
+				761066107619107F25FCD7BB /* TextRecognizer.swift in Sources */,
+				78934D77BB88DE03C87B87AF /* TokenBoxBuilder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ACCADB7CBCC14C18BADC4F17 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2858D11DB24AD8A55BF263F /* DictionaryDatabaseTests.swift in Sources */,
+				BEB42108C62C54FDB69B2E02 /* SegmenterTests.swift in Sources */,
+				C66B59A1DEF54DF36B4433BB /* TestDictionaryFactory.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3133C8E56E2D865E7135FD20 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0DD9EEA1E6A5E89205C9405C /* KanjiScanner */;
+			targetProxy = CEAA9E27768A909553237912 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1D6A1A5934AF8C436FFACCCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		1F02AFDF296CF8084686DE18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XXQ9DMRYW7;
+				INFOPLIST_FILE = KanjiScanner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.asaaugustin.KanjiScanner;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A83F468B4D6958AC244001B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XXQ9DMRYW7;
+				INFOPLIST_FILE = KanjiScanner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.asaaugustin.KanjiScanner;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C08F7C963B2BA176E6347807 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.asaaugustin.KanjiScannerTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KanjiScanner.app/KanjiScanner";
+			};
+			name = Release;
+		};
+		E3C0C4AA6219C0BDEEE48D6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F7468FE2A1938384C7F9266A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.asaaugustin.KanjiScannerTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KanjiScanner.app/KanjiScanner";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		25B2B51F3CC4238DA2F2F0E4 /* Build configuration list for PBXNativeTarget "KanjiScanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A83F468B4D6958AC244001B1 /* Debug */,
+				1F02AFDF296CF8084686DE18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		72470221094C30FB3599A34B /* Build configuration list for PBXProject "KanjiScanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E3C0C4AA6219C0BDEEE48D6F /* Debug */,
+				1D6A1A5934AF8C436FFACCCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D316C7BB19D1E039F2FCF8B4 /* Build configuration list for PBXNativeTarget "KanjiScannerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F7468FE2A1938384C7F9266A /* Debug */,
+				C08F7C963B2BA176E6347807 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7996FA4421B2991E832A2289 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.29.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AE63BD958A5116A591493385 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7996FA4421B2991E832A2289 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		B28E88076FAC7B4AC27F9E7E /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7996FA4421B2991E832A2289 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 2D6765F2A1E1CB4A5A132435 /* Project object */;
+}
