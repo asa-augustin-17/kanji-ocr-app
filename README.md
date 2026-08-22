@@ -1,6 +1,6 @@
 # Kanji Scanner
 
-Offline iOS kanji/compound OCR + dictionary lookup. See [docs/Kanji_Scanner_PRD_v1.md.pdf](docs/Kanji_Scanner_PRD_v1.md.pdf) for the full spec.
+Offline iOS kanji/compound OCR + dictionary lookup. See [docs/Kanji_Scanner_PRD_v1.md.pdf](docs/Kanji_Scanner_PRD_v1.md.pdf) for the full spec, [STORIES.md](STORIES.md) for the user story log, and [BUGS.md](BUGS.md) for the bug log.
 
 ## Layout
 
@@ -31,4 +31,4 @@ Requires full Xcode (not just Command Line Tools) to build/run — install from 
 
 ## Status
 
-Data pipeline and full app source (camera capture, on-device Vision OCR, longest-match dictionary segmentation, hierarchical results UI, unit tests) are written and syntax-checked, but not yet compiled/run in Xcode — pending Xcode install. Next step once Xcode is ready: build, fix any compile errors, and run through the PRD's acceptance criteria on a simulator.
+Builds and runs on a physical iPhone: camera capture, on-device Vision OCR, longest-match dictionary segmentation, and hierarchical results UI are all working end-to-end, with pinch-to-zoom/pan on the scan overlay for precise region selection. See [BUGS.md](BUGS.md) for what's been found/fixed along the way. Still open: full on-device verification of OCR/segmentation/results accuracy against varied real-world printed text (task tracked separately), and the accidental-tap-during-pan issue (BUG-008/009) is currently unfixed after a revert.
