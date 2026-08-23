@@ -1,6 +1,6 @@
 # User Story Log
 
-Tracks every user story driving Kanji Scanner — both the original PRD stories and enhancement requests that came up afterward. New stories go at the bottom of their section (numbering is chronological, not priority order). Cross-reference [BUGS.md](BUGS.md) for defects found while building/testing these.
+Tracks every user story driving Kanji Scanner — both the original PRD stories and enhancement requests that came up afterward. New stories go at the top of the enhancement-requests table (numbering is chronological, not priority order — the table sorts newest-ID-first). Cross-reference [BUGS.md](BUGS.md) for defects found while building/testing these.
 
 ## Status values
 - **Not Started**
@@ -57,10 +57,88 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
+| US-24 | Expand vocab matching to names of people and organizations | Not Started | User request | 2026-08-23 | v1 |
+| US-23 | Expand vocab matching to katakana words | Not Started | User request | 2026-08-23 | v1 |
+| US-22 | Tap a kanji breakdown entry for a detail page with more tags | Not Started | User request | 2026-08-23 | v1 |
+| US-21 | Group similar/related dictionary senses instead of one long list | Not Started | User request | 2026-08-23 | v1 |
+| US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Not Started | User request | 2026-08-23 | v1 |
+| US-19 | Treat a single detected character as a vocab term, not just a kanji | Not Started | User request | 2026-08-23 | v1 |
+| US-18 | Display vocab furigana above the characters, not below | Not Started | User request | 2026-08-23 | v1 |
+| US-17 | Add WaniKani level and JLPT level to the words table | Not Started | User request | 2026-08-23 | v1 |
+| US-16 | Add WaniKani level and Jōyō status to the kanji table | Not Started | User request | 2026-08-23 | v1 |
+| US-15 | Smooth, decaying scroll deceleration on the captured photo | Not Started | User request | 2026-08-23 | v1 |
+| US-14 | Fix the scan-overlay zoom-out "kink" (see BUG-010) | Not Started | User request | 2026-08-23 | v1 |
+| US-13 | Tap to focus the camera before capturing | Not Started | User request | 2026-08-23 | v1 |
+| US-12 | Pinch-to-zoom the live camera before capturing | Not Started | User request | 2026-08-23 | v1 |
 | US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Not Started | User request | 2026-08-23 | v1 |
 | US-10 | Resume the same zoom/pan level when backing out of a result | Verified | User request | 2026-08-23 | v1 |
 | US-9 | Pinch-to-zoom on the captured photo | Implemented | User request | 2026-08-22 | v1 |
 | US-8 | Return to the captured photo to select a different region | Implemented | User request | 2026-08-22 | v1 |
+
+### Camera
+
+**US-12 — Pinch-to-zoom the live camera before capturing.** As a learner, I want to zoom in on the live camera view before I tap capture, so that I can focus on small text (e.g. a single line on a crowded sign) without having to get physically closer or rely entirely on post-capture zoom.
+- Distinct from US-9 (zooming the *captured photo* after the fact) — this is zooming the *live viewfinder*, changing what's actually captured.
+- *Not started.*
+
+**US-13 — Tap to focus the camera before capturing.** As a learner, I want to tap on the live camera view to focus on a specific spot, so that blurry or off-focus text becomes sharp before I capture it, improving OCR accuracy.
+- *Not started.*
+
+### Captured Picture
+
+**US-14 — Fix the scan-overlay zoom-out "kink" (see BUG-010).** As a learner, I want zooming out on the captured photo to feel like one smooth motion, so that the interaction feels polished rather than glitchy.
+- Same underlying issue as [BUG-010](BUGS.md) (deferred after multiple failed fix attempts) — logged here as a story too per the user's request, since it's a piece of desired product behavior, not just a defect to patch.
+- *Not started.*
+
+**US-15 — Smooth, decaying scroll deceleration on the captured photo.** As a learner, I want panning around the zoomed-in photo to slow down gradually after I lift my finger (like the Photos app), instead of stopping dead the instant I release, so that panning around a large zoomed-in image feels natural rather than abrupt.
+- Currently panning has no momentum at all — motion stops exactly when the touch ends.
+- Distinct from US-14/BUG-010: this is about adding inertia/momentum to panning, not about the zoom-out kink.
+- *Not started.*
+
+### Databases
+
+**US-16 — Add WaniKani level and Jōyō status to the kanji table.** As a learner, I want to (eventually) see a kanji's WaniKani level and whether it's a Jōyō (standard-use) kanji, so that I can gauge how commonly-taught/important a character is.
+- `is_joyo` may not need new source data: KANJIDIC2's existing `grade` field (already in the schema) encodes this — grades 1–8 are Jōyō kanji (taught in grades 1–6, plus remaining secondary-school Jōyō), grade 9/10 is Jinmeiyō (name-use only), and no grade means neither — so `is_joyo` could likely be derived from `grade` rather than sourced externally.
+- WaniKani level is *not* part of KANJIDIC2 and has no official public dataset from WaniKani itself — sourcing it would need either a community-maintained mapping or manual curation. Flagged by the user as "if this data is available" — needs research before implementation.
+- Per FR-13, the schema is already designed to accept fields like this without a breaking migration.
+- *Not started.*
+
+**US-17 — Add WaniKani level and JLPT level to the words table.** As a learner, I want to (eventually) see a vocab word's WaniKani level and JLPT level, so that I can gauge how commonly-taught the word is, the same way I could for individual kanji.
+- JMdict does not carry current JLPT-level tags for words (the old tagging was deprecated); a JLPT word list would need to come from a separate, community-maintained source. Same "if available" caveat as US-16 applies, doubly so here.
+- *Not started.*
+
+### Dictionary
+
+**US-18 — Display vocab furigana above the characters, not below.** As a learner, I want the reading of a compound word shown as furigana directly above its kanji (as it appears in real printed Japanese), so that the results screen reads the way native materials actually present readings, rather than as a separate line underneath.
+- Currently the word's reading is shown as a full separate line below the surface form (`WordSection` in `ResultsView.swift`), not per-character ruby-style furigana above each kanji.
+- *Not started.*
+
+**US-19 — Treat a single detected character as a vocab term, not just a kanji.** As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.
+- Today, per FR-15/US-3, a single-kanji selection always shows the isolated-kanji detail view (`KanjiDetailView`) — it never checks whether that single character is *also* a `words` table entry in its own right.
+- New behavior: default to showing the word entry (if the single character matches one) at the top, with its one-kanji breakdown below — mirroring the exact layout `WordSection` + `KanjiBreakdownSection` already use for 2+ kanji compounds.
+- *Not started.*
+
+**US-20 — Show vocab tags (part of speech, common, JLPT, WaniKani) in results.** As a learner, I want to see a word's part of speech, whether it's a common word, and (once available) its JLPT/WaniKani level directly on the results screen, so that I get more context about the word without leaving the app.
+- `part_of_speech` and `is_common` already exist in the `words` schema (populated from JMdict) but per FR-13 are deliberately not surfaced in the v1 UI — this story is exactly the "later version" FR-13 anticipated.
+- JLPT/WaniKani display depends on US-17 actually having that data available.
+- *Not started.*
+
+**US-21 — Group similar/related dictionary senses instead of one long list.** As a learner, I want related meanings for a word or kanji grouped together (the way Jisho.org visually clusters related senses), instead of a single flat bulleted list, so that I can more quickly tell which meanings are closely related versus genuinely distinct usages.
+- Would likely require re-examining how `meanings` are stored/parsed from JMdict's `<sense>` groupings (currently flattened into one JSON array per entry in `build_dictionary.py`) to preserve sense-group boundaries.
+- *Not started.*
+
+**US-22 — Tap a kanji breakdown entry for a detail page with more tags.** As a learner, I want to tap on one of the kanji rows in a compound's breakdown and open a dedicated, more detailed page for that character — including tags like Jōyō status, frequency rank, JLPT level, and WaniKani level — so that I can dig deeper into one specific kanji without that detail cluttering the compact breakdown row.
+- `frequency_rank` and `jlpt_level` already exist in the `kanji` schema (populated from KANJIDIC2) but aren't surfaced anywhere in the UI yet.
+- Depends on US-16 for Jōyō/WaniKani fields existing at all.
+- *Not started.*
+
+**US-23 — Expand vocab matching to katakana words.** As a learner, I want katakana words (loanwords, onomatopoeia, etc.) to be recognized and looked up too, not just kanji and kanji compounds, so that I don't hit a dead end scanning text that's partly or fully katakana.
+- Current segmentation (`Segmenter.swift`) and dictionary import (`build_dictionary.py`'s kanji-only filter) are deliberately scoped to kanji/kanji-compounds only, per the PRD's v1 non-goals — this is an explicit expansion beyond that original scope.
+- *Not started.*
+
+**US-24 — Expand vocab matching to names of people and organizations.** As a learner, I want proper nouns (people's names, company/organization names) to resolve to a dictionary entry when possible, instead of always hitting "no dictionary entry found," so that I'm not stuck on names I encounter while reading.
+- JMdict itself excludes most proper nouns; this would likely need EDRDG's separate `ENAMDICT`/`JMnedict` name dictionary as an additional data source in the build pipeline.
+- *Not started.*
 
 **US-8 — Return to the captured photo to select a different region.** As a learner, when a scan detects multiple words/kanji, I want to go back to the photo I just captured after viewing one result, so that I can look up the other regions without retaking the photo.
 - A "Back" action on the results screen returns to the same captured photo with all its detected regions still tappable.
