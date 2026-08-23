@@ -69,6 +69,8 @@ private struct WordSection: View {
 }
 
 /// Constituent kanji, visually subordinate to the word entry above (FR-14).
+/// See `KanjiRow`'s doc comment for why its column alignment is a fixed
+/// indent rather than a measured width.
 private struct KanjiBreakdownSection: View {
     let entries: [KanjiEntry]
 
@@ -93,24 +95,54 @@ private struct KanjiBreakdownSection: View {
     }
 }
 
-/// Compact row used inside the kanji breakdown list.
+/// One row of the kanji breakdown. The character is drawn as an overlay at
+/// a fixed inset, on top of a reading/meaning block that's itself given a
+/// fixed leading indent — so its position can't be influenced by the
+/// character's rendered width, the row's height, or any other row's content.
+///
+/// The indent is a hardcoded number, not a width measured from any sibling
+/// view. Four earlier attempts measured instead: HStack top/center
+/// alignment, an explicit `.frame(width:)` on the character, and two Grid
+/// variants (a plain cell, then a fixed-size `Color` cell) — the last of
+/// which used one `Grid` correctly scoped around the whole row list (not
+/// one `Grid` per row), which should have guaranteed matching column widths
+/// but still didn't hold up in on-device testing. Rather than keep
+/// debugging why, this drops measurement from the equation entirely: a
+/// literal `.padding(.leading, N)` cannot depend on any other view's
+/// content, by construction.
+///
+/// `textLeadingIndent` (64) needs to clear `characterLeadingInset` (12) +
+/// the widest character glyph at 36pt semibold (a single CJK character is
+/// reliably under 44pt at this size/weight) + a small gap — the `frame`
+/// below defensively caps the glyph's width to the remaining space so an
+/// unexpectedly wide glyph gets clipped rather than overlapping the text.
 private struct KanjiRow: View {
     let entry: KanjiEntry
 
-    var body: some View {
-        HStack(alignment: .top, spacing: 16) {
-            Text(entry.character)
-                .font(.system(size: 36, weight: .semibold))
-                .frame(width: 56)
+    private static let characterLeadingInset: CGFloat = 12
+    private static let textLeadingIndent: CGFloat = 64
 
-            VStack(alignment: .leading, spacing: 4) {
-                ReadingsLine(onyomi: entry.onyomi, kunyomi: entry.kunyomi)
-                Text(entry.meanings.joined(separator: ", "))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ReadingsLine(onyomi: entry.onyomi, kunyomi: entry.kunyomi)
+            Text(entry.meanings.joined(separator: ", "))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
         .padding(12)
+        .padding(.leading, Self.textLeadingIndent - 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .leading) {
+            Text(entry.character)
+                .font(.system(size: 36, weight: .semibold))
+                .lineLimit(1)
+                .frame(
+                    width: Self.textLeadingIndent - Self.characterLeadingInset,
+                    alignment: .leading
+                )
+                .clipped()
+                .padding(.leading, Self.characterLeadingInset)
+        }
     }
 }
 
