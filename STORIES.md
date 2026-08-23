@@ -57,6 +57,8 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
+| US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Not Started | User request | 2026-08-23 | v1 |
+| US-10 | Resume the same zoom/pan level when backing out of a result | Verified | User request | 2026-08-23 | v1 |
 | US-9 | Pinch-to-zoom on the captured photo | Implemented | User request | 2026-08-22 | v1 |
 | US-8 | Return to the captured photo to select a different region | Implemented | User request | 2026-08-22 | v1 |
 
@@ -64,6 +66,17 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 - A "Back" action on the results screen returns to the same captured photo with all its detected regions still tappable.
 - Distinct from "Scan Again," which starts an entirely new capture.
 - *Implemented as part of the same fix as BUG-002; pending re-confirmation on-device.*
+
+**US-11 — Setting to toggle resume-zoom-on-back behavior on/off.** As a learner, I want to be able to turn off the "resume zoom on back" behavior (US-10) if I don't like it, so that I can get the old always-reset-to-1x behavior back instead.
+- Explicitly out of scope for the initial US-10 implementation — logged separately since it's a distinct piece of work (a settings surface, a persisted preference, and branching behavior based on it) rather than part of the core feature.
+- The app currently has no settings/preferences screen at all (PRD explicitly excludes one from v1 — see PRD §4.7/§6), so this would also be the first thing to require one.
+- *Not started.*
+
+**US-10 — Resume the same zoom/pan level when backing out of a result.** As a learner, after tapping a word/kanji and viewing its results, I want the photo to still be zoomed to where I left it when I hit "Back," so that I can quickly tap another nearby word without having to re-find and re-zoom to the same spot — since the next word I want is often right next to the one I just looked up.
+- Zoom scale and pan position from the scan overlay are preserved across a Results → Back → overlay round trip.
+- A genuinely new capture (via "Retake" or "Scan Again" leading to a new photo) starts fresh at 1x, unzoomed — the resumed state only applies to revisiting the *same* captured photo.
+- No user-facing setting for this yet — it's the only behavior; making it optional is tracked separately as US-11.
+- *Implemented by lifting the zoom/pan state out of `ScanOverlayView` into `RootView`, so it survives the view being recreated on Back navigation, instead of resetting to defaults each time. User-confirmed on-device.*
 
 **US-9 — Pinch-to-zoom on the captured photo.** As a learner, I want to pinch-zoom and pan around the captured photo before selecting a region, so that I can accurately tap small or tightly-packed kanji that the app doesn't let me manually crop.
 - Pinch zooms in/out (1x–6x); drag pans once zoomed in.

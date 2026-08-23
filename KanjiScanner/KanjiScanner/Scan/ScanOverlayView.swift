@@ -9,13 +9,19 @@ struct ScanOverlayView: View {
     let regions: [ScanRegion]
     var onSelect: (LookupResult) -> Void
     var onRetake: () -> Void
+    /// Owned by the parent (not local @State) so the current zoom/pan
+    /// survives this view being torn down and recreated — e.g. when the
+    /// user backs out of a result to pick a different region (US-10).
+    @Binding var scale: CGFloat
+    @Binding var offset: CGSize
 
     private static let minZoom: CGFloat = 1
     private static let maxZoom: CGFloat = 6
 
-    @State private var scale: CGFloat = minZoom
+    // Bookkeeping only, local to a single gesture's lifetime — re-synced
+    // from the (possibly-resumed) scale/offset bindings on every appearance
+    // rather than carried across view recreations itself.
     @State private var committedScale: CGFloat = minZoom
-    @State private var offset: CGSize = .zero
     @State private var committedOffset: CGSize = .zero
     /// True while a real pan or pinch is in progress (or just finished),
     /// used to suppress a region Button's action so starting a pan/zoom
@@ -72,6 +78,11 @@ struct ScanOverlayView: View {
             }
         }
         .onAppear {
+            // Resume gesture bookkeeping from whatever zoom/pan the parent
+            // is currently holding (e.g. carried over from before "Back"),
+            // rather than always starting from an unzoomed 1x/zero state.
+            committedScale = scale
+            committedOffset = offset
             if regions.count == 1, let only = regions.first {
                 onSelect(only.result)
             }

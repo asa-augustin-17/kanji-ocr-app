@@ -12,6 +12,12 @@ struct RootView: View {
     @StateObject private var cameraViewModel = CameraViewModel()
     @State private var screen: Screen = .camera
 
+    // Owned here (not by ScanOverlayView) so it survives Results' "Back"
+    // action recreating that view — resuming the same zoom/pan the user had
+    // rather than resetting to the full, unzoomed photo (US-10).
+    @State private var zoomScale: CGFloat = 1
+    @State private var zoomOffset: CGSize = .zero
+
     private let textRecognizer = TextRecognizer()
     private let database = DictionaryDatabase.shared
 
@@ -19,6 +25,10 @@ struct RootView: View {
         switch screen {
         case .camera:
             CameraView(viewModel: cameraViewModel) { image in
+                // A genuinely new photo shouldn't inherit the previous
+                // photo's zoom/pan state.
+                zoomScale = 1
+                zoomOffset = .zero
                 screen = .processing(image)
                 process(image)
             }
@@ -31,7 +41,9 @@ struct RootView: View {
                 image: image,
                 regions: regions,
                 onSelect: { result in screen = .results(image: image, regions: regions, result: result) },
-                onRetake: { screen = .camera }
+                onRetake: { screen = .camera },
+                scale: $zoomScale,
+                offset: $zoomOffset
             )
         case let .results(image, regions, result):
             ResultsView(result: result) {
