@@ -17,6 +17,15 @@ struct ScanOverlayView: View {
     @State private var committedScale: CGFloat = minZoom
     @State private var offset: CGSize = .zero
     @State private var committedOffset: CGSize = .zero
+    /// True while a real pan or pinch is in progress (or just finished),
+    /// used to suppress a region Button's action so starting a pan/zoom
+    /// with a finger over a box doesn't also open its results (BUG-008).
+    /// Deliberately doesn't touch the buttons' own hit-testing/recognition
+    /// — that part already works reliably — it only gates what their
+    /// action *does*. A previous attempt replaced hit-testing entirely and
+    /// broke tap responsiveness for most regions (BUG-009); this is a much
+    /// smaller, additive change.
+    @State private var isInteracting = false
 
     private var imageSize: CGSize {
         CGSize(width: image.width, height: image.height)
@@ -37,7 +46,7 @@ struct ScanOverlayView: View {
 
                         ForEach(regions) { region in
                             let rect = Self.viewRect(for: region.normalizedRect, in: displayRect)
-                            Button(action: { onSelect(region.result) }) {
+                            Button(action: { selectRegion(region.result) }) {
                                 RoundedRectangle(cornerRadius: 4)
                                     .stroke(Color.yellow, lineWidth: 2)
                                     .background(RoundedRectangle(cornerRadius: 4).fill(Color.yellow.opacity(0.12)))
@@ -69,6 +78,24 @@ struct ScanOverlayView: View {
         }
     }
 
+    private func selectRegion(_ result: LookupResult) {
+        guard !isInteracting else { return }
+        onSelect(result)
+    }
+
+    /// Marks interaction active immediately, and clears it a beat after the
+    /// gesture ends rather than synchronously in `onEnded` — a region
+    /// Button's own action (if its lenient internal tap tolerance still let
+    /// it fire despite real movement) resolves at essentially the same
+    /// touch-up moment, so clearing the flag immediately risked a race where
+    /// the button's action could still slip through right as the gesture
+    /// finished.
+    private func scheduleInteractionReset() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            isInteracting = false
+        }
+    }
+
     /// Zooms around wherever the pinch started, by solving for the `offset`
     /// that keeps that touch point visually fixed on screen as `scale`
     /// changes — rather than moving `scaleEffect`'s anchor (which snaps the
@@ -84,6 +111,7 @@ struct ScanOverlayView: View {
     private func magnifyGesture(contentSize: CGSize) -> some Gesture {
         MagnifyGesture()
             .onChanged { value in
+                isInteracting = true
                 let newScale = min(max(committedScale * value.magnification, Self.minZoom), Self.maxZoom)
                 let center = CGPoint(x: contentSize.width / 2, y: contentSize.height / 2)
                 let touch = value.startLocation
@@ -104,12 +132,18 @@ struct ScanOverlayView: View {
                     }
                     committedOffset = .zero
                 }
+                scheduleInteractionReset()
             }
     }
 
     private func panGesture(contentSize: CGSize) -> some Gesture {
         DragGesture()
             .onChanged { value in
+                // Reaching onChanged at all means SwiftUI's own minimumDistance
+                // threshold (10pt default) was crossed — a real drag, not tap
+                // jitter — so this is a reliable, ready-made "is this a pan?"
+                // signal without needing our own threshold math.
+                isInteracting = true
                 guard scale > Self.minZoom else { return }
                 let rawOffset = CGSize(
                     width: committedOffset.width + value.translation.width,
@@ -119,6 +153,7 @@ struct ScanOverlayView: View {
             }
             .onEnded { _ in
                 committedOffset = offset
+                scheduleInteractionReset()
             }
     }
 
