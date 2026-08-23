@@ -1,20 +1,31 @@
 # User Story Log
 
-Tracks every user story driving Kanji Scanner — both the original PRD stories and enhancement requests that came up afterward. New stories go at the top of the enhancement-requests table (numbering is chronological, not priority order — the table sorts newest-ID-first). Cross-reference [BUGS.md](BUGS.md) for defects found while building/testing these.
+Tracks every user story driving Kanji Scanner — both the original PRD stories and enhancement requests that came up afterward. New stories go at the top of their table (numbering is chronological, not priority order — tables sort newest-ID-first). Cross-reference [BUGS.md](BUGS.md) for defects found while building/testing these.
 
 ## Status values
 - **Not Started**
 - **Implemented** — code complete, built against the acceptance criteria below
 - **Verified** — confirmed working on a physical device by the user
 
+## v1 closure review (2026-08-23)
+
+Went through every v1-scoped story (US-1–US-11) and PRD functional requirement against the current code, updating statuses where extensive on-device use during the BUG-008/009/010/011 investigations effectively already verified something. Two real gaps surfaced, neither blocking normal use today, both worth a decision before calling v1 fully closed:
+
+1. **US-4's third bullet ("falls back to kanji-level results if no compound match is found") isn't actually reachable.** `Segmenter` only ever emits a multi-kanji token when a compound match *is* found — if it isn't, segmentation falls back one kanji at a time, so the results screen never sees a ">1 kanji, no word" state to show a fallback for. In practice this just means: a real OCR'd compound that isn't in the dictionary gets silently split into single-kanji lookups instead of showing a "no compound match" indicator alongside the individual kanji. Low real-world impact (JMdict's compound coverage is good), but it's a genuine, if narrow, gap against the PRD's stated acceptance criteria.
+2. **FR-13's schema requirement is only half met.** FR-13 asked v1's schema to reserve columns for JLPT level, WaniKani-style level, and common-use/frequency flags — specifically so a *later* version could populate them without a migration. JLPT (`jlpt_level`) and frequency/common-use (`frequency_rank`, `is_common`) columns exist; a WaniKani-level column was never added to either table. This is now directly relevant to the new backlog items US-16/US-17, which would need to add it anyway — but it means FR-13's original v1 promise ("no migration needed later") isn't actually true yet for that one field.
+
+Also worth a few quick explicit spot-checks before considering v1 fully signed off, since they haven't been directly observed yet even though the code looks correct: an isolated single-kanji result (every screenshot so far has been a multi-kanji compound), the low-confidence "couldn't confidently read this" state, the "no dictionary entry found" state, single-region auto-select, and an explicit airplane-mode check for US-5.
+
+Per-story detail and status updates are below.
+
 ## From the original PRD (v1)
 
 | ID | Story | Status | Version |
 |----|---|---|---|
 | US-1 | Capture a photo of printed Japanese text | Verified | v1 |
-| US-2 | Select the specific text region to look up | Implemented | v1 |
+| US-2 | Select the specific text region to look up | Verified | v1 |
 | US-3 | View dictionary results for an isolated kanji | Implemented | v1 |
-| US-4 | View dictionary results for a kanji compound/word | Implemented | v1 |
+| US-4 | View dictionary results for a kanji compound/word | Verified | v1 |
 | US-5 | Use the app with no network connection | Implemented | v1 |
 | US-6 | Handle unrecognized or low-confidence scans gracefully | Implemented | v1 |
 | US-7 | Retain the option to re-scan quickly | Verified | v1 |
@@ -29,51 +40,85 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 - After capture, bounding boxes overlay all detected text regions — no manual cropping step.
 - Tapping a region selects it for lookup; a single detected region auto-selects.
 - User can retake the photo if no usable text was detected.
-- *Implemented; end-to-end verification with real printed text against the dictionary is still pending.*
+- *Verified on-device: tap-to-select has been exercised repeatedly and reliably across many real scans during the BUG-008/009/011 investigations (e.g. 読書感想文, 事故, 栃木県, 仕事). The specific "only one region detected → auto-selects without a tap" path hasn't been explicitly observed, though the code path is unconditional and simple — worth one quick spot-check with an image containing exactly one kanji region.*
 
 **US-3 — View dictionary results for an isolated kanji.** As a learner, I want to see the reading(s) and meaning(s) of a single kanji I've scanned, so that I understand what it means and how to say it.
 - Results show the character, on'yomi (katakana), kun'yomi (hiragana), and English meaning(s).
 - Multiple meanings all shown.
 - Results render within 2 seconds, fully offline.
+- *Implemented (`KanjiDetailView`), and its layout building blocks (character/readings/meanings rendering) are the same ones proven working in every compound-breakdown screenshot — but the specific top-level "tapped a standalone kanji that isn't part of any recognized compound" screen hasn't actually been seen on-device yet; every screenshot so far has been a multi-kanji compound. Worth one explicit spot-check on an isolated kanji.*
 
 **US-4 — View dictionary results for a kanji compound/word.** As a learner, I want to see the compound word's reading and meaning first, with each constituent kanji broken out below it, so that I understand both the word as a whole and its building blocks (Yomitan-style).
 - Compound word, reading, and meaning(s) shown at the top.
 - Each constituent kanji listed below with its own readings/meanings.
 - Falls back to kanji-level-only results (with a clear indicator) if no compound match is found.
+- *Verified on-device for the first two bullets (読書感想文, 事故, 栃木県, 仕事 all confirmed rendering correctly through the BUG-011 alignment work). **Gap found in this v1 review:** the third bullet's fallback path is not actually reachable by the current implementation — `Segmenter` only ever produces a multi-character token when a compound match is found; if no compound matches, it falls back to segmenting one kanji at a time, so there's no code path that reaches "no compound match found" with more than one kanji in the breakdown. In practice this means: scanning a real (dictionary) compound works correctly, but there's no "no compound match" indicator UI to fall back to, because that state can't currently occur. Flagged for a decision — see closure notes.*
 
 **US-5 — Use the app with no network connection.** As a learner, I want the app to work exactly the same on a subway with no signal or in airplane mode as it does with full connectivity, so that I never lose functionality when I need it most.
 - OCR, segmentation, and dictionary lookup all run fully on-device; no network code exists in the app.
+- *Structurally guaranteed (there is no networking code anywhere in the app to fail), but never explicitly exercised with an actual airplane-mode test on-device. Worth a quick explicit check before calling v1 fully done, even though it's very low-risk.*
 
 **US-6 — Handle unrecognized or low-confidence scans gracefully.** As a learner, I want clear feedback when the app can't confidently identify text, so that I know to retake the photo rather than getting a wrong answer.
 - Below-threshold OCR confidence shows "couldn't confidently read this — try retaking the photo" instead of a guessed result.
 - Recognized-but-not-in-dictionary text clearly states "no dictionary entry found."
+- *Implemented (`lowConfidenceState` in `ScanOverlayView`, `NoMatchView` in results), but neither state has been explicitly seen on-device yet — no screenshot so far has shown either. Note: a photo with text that OCR reads confidently but contains zero kanji (pure kana/romaji) currently also lands on the "couldn't confidently read this" message, since no tappable regions get built for it — the wording is a bit of a mismatch for that specific case (it wasn't a confidence problem), though the suggested action (retake) is still reasonable. Not a blocker, just a minor phrasing note.*
 
 **US-7 — Retain the option to re-scan quickly.** As a learner, I want to return to the camera quickly after viewing a result, so that I can look up the next unfamiliar kanji without extra taps.
 - A single, obvious "Scan Again" action returns to the live camera view.
 - No re-granting permissions or reloading the app.
 - *Verified on-device: confirmed fast/responsive after fixing BUG-005 (previously ~5s delay).*
 
-## Enhancement requests (post-v1 build)
+## Enhancement requests delivered in v1
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
-| US-24 | Expand vocab matching to names of people and organizations | Not Started | User request | 2026-08-23 | v1 |
-| US-23 | Expand vocab matching to katakana words | Not Started | User request | 2026-08-23 | v1 |
-| US-22 | Tap a kanji breakdown entry for a detail page with more tags | Not Started | User request | 2026-08-23 | v1 |
-| US-21 | Group similar/related dictionary senses instead of one long list | Not Started | User request | 2026-08-23 | v1 |
-| US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Not Started | User request | 2026-08-23 | v1 |
-| US-19 | Treat a single detected character as a vocab term, not just a kanji | Not Started | User request | 2026-08-23 | v1 |
-| US-18 | Display vocab furigana above the characters, not below | Not Started | User request | 2026-08-23 | v1 |
-| US-17 | Add WaniKani level and JLPT level to the words table | Not Started | User request | 2026-08-23 | v1 |
-| US-16 | Add WaniKani level and Jōyō status to the kanji table | Not Started | User request | 2026-08-23 | v1 |
-| US-15 | Smooth, decaying scroll deceleration on the captured photo | Not Started | User request | 2026-08-23 | v1 |
-| US-14 | Fix the scan-overlay zoom-out "kink" (see BUG-010) | Not Started | User request | 2026-08-23 | v1 |
-| US-13 | Tap to focus the camera before capturing | Not Started | User request | 2026-08-23 | v1 |
-| US-12 | Pinch-to-zoom the live camera before capturing | Not Started | User request | 2026-08-23 | v1 |
 | US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Not Started | User request | 2026-08-23 | v1 |
 | US-10 | Resume the same zoom/pan level when backing out of a result | Verified | User request | 2026-08-23 | v1 |
-| US-9 | Pinch-to-zoom on the captured photo | Implemented | User request | 2026-08-22 | v1 |
-| US-8 | Return to the captured photo to select a different region | Implemented | User request | 2026-08-22 | v1 |
+| US-9 | Pinch-to-zoom on the captured photo | Verified | User request | 2026-08-22 | v1 |
+| US-8 | Return to the captured photo to select a different region | Verified | User request | 2026-08-22 | v1 |
+
+**US-8 — Return to the captured photo to select a different region.** As a learner, when a scan detects multiple words/kanji, I want to go back to the photo I just captured after viewing one result, so that I can look up the other regions without retaking the photo.
+- A "Back" action on the results screen returns to the same captured photo with all its detected regions still tappable.
+- Distinct from "Scan Again," which starts an entirely new capture.
+- *Verified on-device: used repeatedly and reliably throughout the BUG-011 alignment investigation to navigate back and re-select different kanji within the same photo.*
+
+**US-9 — Pinch-to-zoom on the captured photo.** As a learner, I want to pinch-zoom and pan around the captured photo before selecting a region, so that I can accurately tap small or tightly-packed kanji that the app doesn't let me manually crop.
+- Pinch zooms in/out (1x–6x); drag pans once zoomed in.
+- Zoom is anchored to wherever the user's fingers are, not always the view's center (see BUG-006 for the anchor-jump issue this required fixing).
+- Detected regions' tap targets scale and pan in sync with the image.
+- Pinching back to 1x resets pan.
+- *Verified on-device: core zoom/pan/tap-target behavior confirmed working across many rounds of testing. One known, deliberately deferred limitation remains — see [BUG-010](BUGS.md)/US-14 — where zooming out while panned toward an edge has a brief "kink" in motion; doesn't block the core feature being verified.*
+
+**US-10 — Resume the same zoom/pan level when backing out of a result.** As a learner, after tapping a word/kanji and viewing its results, I want the photo to still be zoomed to where I left it when I hit "Back," so that I can quickly tap another nearby word without having to re-find and re-zoom to the same spot — since the next word I want is often right next to the one I just looked up.
+- Zoom scale and pan position from the scan overlay are preserved across a Results → Back → overlay round trip.
+- A genuinely new capture (via "Retake" or "Scan Again" leading to a new photo) starts fresh at 1x, unzoomed — the resumed state only applies to revisiting the *same* captured photo.
+- No user-facing setting for this yet — it's the only behavior; making it optional is tracked separately as US-11.
+- *Implemented by lifting the zoom/pan state out of `ScanOverlayView` into `RootView`, so it survives the view being recreated on Back navigation, instead of resetting to defaults each time. User-confirmed on-device.*
+
+**US-11 — Setting to toggle resume-zoom-on-back behavior on/off.** As a learner, I want to be able to turn off the "resume zoom on back" behavior (US-10) if I don't like it, so that I can get the old always-reset-to-1x behavior back instead.
+- Explicitly out of scope for the initial US-10 implementation — logged separately since it's a distinct piece of work (a settings surface, a persisted preference, and branching behavior based on it) rather than part of the core feature.
+- The app currently has no settings/preferences screen at all (PRD explicitly excludes one from v1 — see PRD §4.7/§6), so this would also be the first thing to require one.
+- *Not started.*
+
+## Backlog (post-v1)
+
+Requested by the user on 2026-08-23 but explicitly scoped as future work, not part of v1 — logged for planning purposes only, nothing here is implemented or scheduled to a specific version yet.
+
+| ID | Story | Status | Source | Date Added | Version |
+|----|---|---|---|---|---|
+| US-24 | Expand vocab matching to names of people and organizations | Not Started | User request | 2026-08-23 | Backlog |
+| US-23 | Expand vocab matching to katakana words | Not Started | User request | 2026-08-23 | Backlog |
+| US-22 | Tap a kanji breakdown entry for a detail page with more tags | Not Started | User request | 2026-08-23 | Backlog |
+| US-21 | Group similar/related dictionary senses instead of one long list | Not Started | User request | 2026-08-23 | Backlog |
+| US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Not Started | User request | 2026-08-23 | Backlog |
+| US-19 | Treat a single detected character as a vocab term, not just a kanji | Not Started | User request | 2026-08-23 | Backlog |
+| US-18 | Display vocab furigana above the characters, not below | Not Started | User request | 2026-08-23 | Backlog |
+| US-17 | Add WaniKani level and JLPT level to the words table | Not Started | User request | 2026-08-23 | Backlog |
+| US-16 | Add WaniKani level and Jōyō status to the kanji table | Not Started | User request | 2026-08-23 | Backlog |
+| US-15 | Smooth, decaying scroll deceleration on the captured photo | Not Started | User request | 2026-08-23 | Backlog |
+| US-14 | Fix the scan-overlay zoom-out "kink" (see BUG-010) | Not Started | User request | 2026-08-23 | Backlog |
+| US-13 | Tap to focus the camera before capturing | Not Started | User request | 2026-08-23 | Backlog |
+| US-12 | Pinch-to-zoom the live camera before capturing | Not Started | User request | 2026-08-23 | Backlog |
 
 ### Camera
 
@@ -139,26 +184,3 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 **US-24 — Expand vocab matching to names of people and organizations.** As a learner, I want proper nouns (people's names, company/organization names) to resolve to a dictionary entry when possible, instead of always hitting "no dictionary entry found," so that I'm not stuck on names I encounter while reading.
 - JMdict itself excludes most proper nouns; this would likely need EDRDG's separate `ENAMDICT`/`JMnedict` name dictionary as an additional data source in the build pipeline.
 - *Not started.*
-
-**US-8 — Return to the captured photo to select a different region.** As a learner, when a scan detects multiple words/kanji, I want to go back to the photo I just captured after viewing one result, so that I can look up the other regions without retaking the photo.
-- A "Back" action on the results screen returns to the same captured photo with all its detected regions still tappable.
-- Distinct from "Scan Again," which starts an entirely new capture.
-- *Implemented as part of the same fix as BUG-002; pending re-confirmation on-device.*
-
-**US-11 — Setting to toggle resume-zoom-on-back behavior on/off.** As a learner, I want to be able to turn off the "resume zoom on back" behavior (US-10) if I don't like it, so that I can get the old always-reset-to-1x behavior back instead.
-- Explicitly out of scope for the initial US-10 implementation — logged separately since it's a distinct piece of work (a settings surface, a persisted preference, and branching behavior based on it) rather than part of the core feature.
-- The app currently has no settings/preferences screen at all (PRD explicitly excludes one from v1 — see PRD §4.7/§6), so this would also be the first thing to require one.
-- *Not started.*
-
-**US-10 — Resume the same zoom/pan level when backing out of a result.** As a learner, after tapping a word/kanji and viewing its results, I want the photo to still be zoomed to where I left it when I hit "Back," so that I can quickly tap another nearby word without having to re-find and re-zoom to the same spot — since the next word I want is often right next to the one I just looked up.
-- Zoom scale and pan position from the scan overlay are preserved across a Results → Back → overlay round trip.
-- A genuinely new capture (via "Retake" or "Scan Again" leading to a new photo) starts fresh at 1x, unzoomed — the resumed state only applies to revisiting the *same* captured photo.
-- No user-facing setting for this yet — it's the only behavior; making it optional is tracked separately as US-11.
-- *Implemented by lifting the zoom/pan state out of `ScanOverlayView` into `RootView`, so it survives the view being recreated on Back navigation, instead of resetting to defaults each time. User-confirmed on-device.*
-
-**US-9 — Pinch-to-zoom on the captured photo.** As a learner, I want to pinch-zoom and pan around the captured photo before selecting a region, so that I can accurately tap small or tightly-packed kanji that the app doesn't let me manually crop.
-- Pinch zooms in/out (1x–6x); drag pans once zoomed in.
-- Zoom is anchored to wherever the user's fingers are, not always the view's center (see BUG-006 for the anchor-jump issue this required fixing).
-- Detected regions' tap targets scale and pan in sync with the image.
-- Pinching back to 1x resets pan.
-- *Implemented and iteratively refined against live user feedback (initial center-anchored version → per-touch anchor → jump-free offset-based zoom). Awaiting confirmation of the latest fix.*
