@@ -26,6 +26,26 @@ Went through every v1-scoped story (US-1–US-11) and PRD functional requirement
 
 Also worth a few quick explicit spot-checks before considering v1 fully signed off, since they haven't been directly observed yet even though the code looks correct: an isolated single-kanji result (every screenshot so far has been a multi-kanji compound), the low-confidence "couldn't confidently read this" state, the "no dictionary entry found" state, single-region auto-select, and an explicit airplane-mode check for US-5.
 
+The isolated-single-kanji, low-confidence, and no-dictionary-entry spot-checks were completed and confirmed the same day — see US-3/US-5/US-6 below, all closed 2026-08-23. v1 is fully closed as of that point.
+
+## v2 closure review (2026-08-24)
+
+v2 covers everything closed after v1, all landed in a single long session. Effectively release notes — grouped by what a user would notice, not by story ID.
+
+**Dictionary coverage, expanded well beyond kanji/kanji-compounds (v1's only scope):**
+- **Katakana words** are now recognized and looked up — loanwords, onomatopoeia, everything (US-23). A katakana word with no dictionary entry of its own but a legacy kanji form (コーヒー → 珈琲) resolves to that richer entry instead of a dead end.
+- **Counts with Arabic numerals** are recognized too — "1匹" resolves to 一匹's real entry ("one (small animal)"), not just a lone box around the counter kanji (US-31).
+- **A single detected kanji that's also a standalone word** (目, 手, 心, and others) now shows the full word entry — meaning, reading, kanji breakdown — instead of just the bare kanji detail view (US-19).
+- **Per-character furigana**: a compound word's reading is now split and positioned over each kanji individually (like real printed Japanese), rather than one reading floating above the whole word — sourced from a new bundled dataset, [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana) (US-25, superseding the whole-word version US-18 shipped first). Sizing was tuned once more after user feedback (US-26).
+
+**Noise/false-positive cleanup, mostly from OCR misreading non-Japanese symbols as Japanese characters:**
+- A printed period misread as the katakana connector ・ (or a stray ー) no longer gets its own dead-end tap target (BUG-012).
+- A non-Japanese symbol (confirmed case: a heart symbol ♥) misread as a single katakana character no longer gets one either (US-33) — katakana only; a single unmatched *kanji* still shows "no dictionary entry found," per v1's original design, since that case is architecturally different (rare, and the character itself is still real, named information).
+
+**Infrastructure:** the bundled dictionary database is now tracked via Git LFS (grew from ~53MB to ~92MB across this session's additions — furigana data, katakana import, a new index) to avoid GitHub's file-size warnings on every rebuild.
+
+**Deliberately not included in v2** — researched and logged as backlog stories, not implemented: hiragana-only word recognition (US-32, descoped as scope creep for the primary use case, redirected into an opt-in "book reading mode" idea, US-35), conjugated verb/adjective recognition (US-30), loanword etymology display (US-28), a "usually written in kana" note (US-27), example sentences (US-29). One related open decision, not yet resolved either way: whether a multi-character *unmatched* katakana run (e.g. a random string like トズチ) should keep its current dead-end tap target or lose it too, the way single characters now do.
+
 Per-story detail and status updates are below.
 
 ## From the original PRD (v1)
