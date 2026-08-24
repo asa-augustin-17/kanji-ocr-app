@@ -82,7 +82,6 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | [US-29](#us-29) | Show example sentences on dictionary entries | Dictionary | Not Started | 2026-08-24 | — |
 | [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | — |
 | [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | — |
-| [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Not Started | 2026-08-24 | — |
 | [US-35](#us-35) | Add a "book reading mode" setting for hiragana-compound recognition | Dictionary | Not Started | 2026-08-24 | — |
 
 ### Camera
@@ -136,17 +135,6 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 - Currently panning has no momentum at all — motion stops exactly when the touch ends.
 - Distinct from [US-14](#us-14)/[BUG-010](BUGS.md#bug-010): this is about adding inertia/momentum to panning, not about the zoom-out kink.
-- *Not started.*
-
-</details>
-
-<a id="us-34"></a>**US-34 — Don't auto-select when only one region is detected.** As a learner, when a scan detects only one region, I want the captured photo to render normally — showing that one bounding box, waiting for me to tap it — the same as when multiple regions are detected, instead of jumping straight to the results screen without me tapping anything.
-
-<details>
-<summary>Show details</summary>
-
-- **This also reverses an explicit v1 acceptance criterion.** [US-2](#us-2)'s original AC states: "Tapping a region selects it for lookup; a single detected region auto-selects." That auto-select behavior is exactly what's now being asked to remove, based on actually trying it on-device — this was flagged in STORIES.md's own "v1 closure review" as a state that had *never been explicitly observed on-device* despite the code looking correct; now that it has been, the user's assessment is that it's the wrong behavior in practice (it removes the chance to double-check the detected region, and breaks the consistent "photo → tap → results" flow the multi-region case always has).
-- Code: `ScanOverlayView.swift:86` — `.onAppear { ... if regions.count == 1, let only = regions.first { onSelect(only.result) } }`. Removing this block (letting a single-region scan render exactly like a multi-region one, requiring an explicit tap) is the whole fix.
 - *Not started.*
 
 </details>
@@ -533,6 +521,23 @@ As a learner, when OCR recognizes a lone, isolated *katakana* character with no 
 - **Research finding that reframes what this story actually is.** Checked whether excluding single-character katakana results ever hides a real word a learner would want: ト itself *is* a real dictionary entry (`"7th (in a sequence denoted by the iroha system)", "g", "vii", "G (note)"`) — but it was already unreachable before this story too, since `longestKatakanaMatch` never attempts a length-1 candidate at all (unlike kanji, which got that via **[US-19](#us-19)**). Confirmed by direct query: only 30 single-character katakana words exist in the whole bundled dictionary, and *none* are marked `is_common` — solfège note names, iroha ordinals, a handful of grammatical suffixes, historical kana. Given the story's actual origin (filtering out a misrecognized heart symbol) had nothing to do with these 30 obscure entries, and given none of them were reachable before this fix either, **this story is best understood as OCR-noise filtering (like [BUG-012](BUGS.md#bug-012)), not a vocabulary-lookup feature** — there was never a meaningful tradeoff against real single-character katakana words to weigh here.
 - **Open decision — not yet resolved, and separate from this story:** a *multi*-character unmatched katakana run still gets a bounding box + "no entry" screen exactly as before (tested with an arbitrary string, トズチ — still tappable, still dead-ends). Unclear whether that's desirable (could usefully signal "recognized, but not a dictionary word — maybe a name," or could just be clutter). Left as-is pending real-world testing.
 - Verified against the real bundled dictionary: segmenting a lone ト now produces zero tokens (previously one, resolving to "no dictionary entry found"). New regression-guarded unit test confirms a multi-character unmatched katakana run (e.g. メロン) still gets its region, and the existing single-unmatched-*kanji* test is unaffected.
+- *Closed* by the user on-device.
+
+</details>
+
+## v3
+
+| ID | Story | Type | Status | Date Added | Date Resolved | Version |
+|----|---|---|---|---|---|---|
+| [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Closed | 2026-08-24 | 2026-08-24 | v3 |
+
+<details id="us-34">
+<summary><strong>US-34 — Don't auto-select when only one region is detected.</strong></summary>
+
+As a learner, when a scan detects only one region, I want the captured photo to render normally — showing that one bounding box, waiting for me to tap it — the same as when multiple regions are detected, instead of jumping straight to the results screen without me tapping anything.
+- **This also reverses an explicit v1 acceptance criterion.** [US-2](#us-2)'s original AC states: "Tapping a region selects it for lookup; a single detected region auto-selects." That auto-select behavior is exactly what's now being asked to remove, based on actually trying it on-device — this was flagged in STORIES.md's own "v1 closure review" as a state that had *never been explicitly observed on-device* despite the code looking correct; now that it has been, the user's assessment is that it's the wrong behavior in practice (it removes the chance to double-check the detected region, and breaks the consistent "photo → tap → results" flow the multi-region case always has).
+- Implemented by removing the single line in `ScanOverlayView.swift`'s `.onAppear` that auto-selected the sole region (`if regions.count == 1, let only = regions.first { onSelect(only.result) }`) — nothing else changed.
+- Verified via the Simulator debug-harness pattern (a single-region `.overlay` screen built directly in `RootView.swift`, reverted afterward via `git checkout`): the scan overlay now renders the one detected region (目) and waits for a tap instead of jumping straight to results; tapping the box still correctly opens 目's results. Clean `xcodebuild test` passes (25/25).
 - *Closed* by the user on-device.
 
 </details>

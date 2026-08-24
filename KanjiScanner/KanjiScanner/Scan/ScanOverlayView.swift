@@ -83,9 +83,6 @@ struct ScanOverlayView: View {
             // rather than always starting from an unzoomed 1x/zero state.
             committedScale = scale
             committedOffset = offset
-            if regions.count == 1, let only = regions.first {
-                onSelect(only.result)
-            }
         }
     }
 
