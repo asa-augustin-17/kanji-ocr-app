@@ -1,6 +1,6 @@
 # User Story Log
 
-Tracks every user story driving Kanji Scanner — both the original PRD stories and enhancement requests that came up afterward. New stories go at the top of their table (numbering is chronological, not priority order — tables sort newest-ID-first). Cross-reference [BUGS.md](BUGS.md) for defects found while building/testing these.
+Tracks every user story driving Kanji Scanner — both the original PRD stories and enhancement requests that came up afterward. Tables are sorted by ID, ascending. Cross-reference [BUGS.md](BUGS.md) for defects found while building/testing these.
 
 ## Status values
 - **Not Started**
@@ -56,24 +56,24 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 | ID | Story | Type | Status | Date Added | Version |
 |----|---|---|---|---|---|
+| [US-11](#us-11) | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | Backlog |
+| [US-12](#us-12) | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | Backlog |
+| [US-13](#us-13) | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | Backlog |
+| [US-14](#us-14) | Fix the scan-overlay zoom-out "kink" (see [BUG-010](BUGS.md#bug-010)) | Captured Picture | Not Started | 2026-08-23 | Backlog |
+| [US-15](#us-15) | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | Backlog |
+| [US-16](#us-16) | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | Backlog |
+| [US-17](#us-17) | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | Backlog |
+| [US-20](#us-20) | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | Backlog |
+| [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | Backlog |
+| [US-22](#us-22) | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | Backlog |
+| [US-24](#us-24) | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | Backlog |
+| [US-27](#us-27) | Note when a word is usually written using kana alone | Dictionary | Not Started | 2026-08-24 | Backlog |
+| [US-28](#us-28) | Show loanword etymology (source language/word) | Dictionary | Not Started | 2026-08-24 | Backlog |
+| [US-29](#us-29) | Show example sentences on dictionary entries | Dictionary | Not Started | 2026-08-24 | Backlog |
+| [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | Backlog |
+| [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | Backlog |
 | [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Not Started | 2026-08-24 | Backlog |
 | [US-35](#us-35) | Add a "book reading mode" setting for hiragana-compound recognition | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-29](#us-29) | Show example sentences on dictionary entries | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-28](#us-28) | Show loanword etymology (source language/word) | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-27](#us-27) | Note when a word is usually written using kana alone | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-24](#us-24) | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-22](#us-22) | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-20](#us-20) | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-17](#us-17) | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | Backlog |
-| [US-16](#us-16) | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | Backlog |
-| [US-15](#us-15) | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | Backlog |
-| [US-14](#us-14) | Fix the scan-overlay zoom-out "kink" (see [BUG-010](BUGS.md#bug-010)) | Captured Picture | Not Started | 2026-08-23 | Backlog |
-| [US-13](#us-13) | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | Backlog |
-| [US-12](#us-12) | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | Backlog |
-| [US-11](#us-11) | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | Backlog |
 
 ### Camera
 
@@ -282,9 +282,9 @@ As a learner, I want to return to the camera quickly after viewing a result, so 
 
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
-| [US-10](#us-10) | Resume the same zoom/pan level when backing out of a result | Captured Picture | Closed | 2026-08-23 | 2026-08-23 | v1 |
-| [US-9](#us-9) | Pinch-to-zoom on the captured photo | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
 | [US-8](#us-8) | Return to the captured photo to select a different region | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
+| [US-9](#us-9) | Pinch-to-zoom on the captured photo | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
+| [US-10](#us-10) | Resume the same zoom/pan level when backing out of a result | Captured Picture | Closed | 2026-08-23 | 2026-08-23 | v1 |
 
 <details id="us-8">
 <summary><strong>US-8 — Return to the captured photo to select a different region.</strong></summary>
@@ -325,13 +325,13 @@ Stories from the backlog that shipped as part of v2 (2026-08-24), landed in a si
 
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
-| [US-33](#us-33) | Exclude unmatched single-character katakana compounds from getting a bounding box | Captured Picture | Closed | 2026-08-24 | 2026-08-24 | v2 |
-| [US-31](#us-31) | Recognize Arabic-numeral + counter (josūshi) compounds | Dictionary | Closed | 2026-08-24 | 2026-08-24 | v2 |
-| [US-26](#us-26) | Tune per-character furigana sizing/legibility | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
-| [US-25](#us-25) | Per-character furigana for compound words (supersedes [US-18](#us-18)) | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
-| [US-23](#us-23) | Expand vocab matching to katakana words | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v2 |
-| [US-19](#us-19) | Treat a single detected character as a vocab term, not just a kanji | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v2 |
 | [US-18](#us-18) | Display vocab furigana above the characters, not below | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
+| [US-19](#us-19) | Treat a single detected character as a vocab term, not just a kanji | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v2 |
+| [US-23](#us-23) | Expand vocab matching to katakana words | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v2 |
+| [US-25](#us-25) | Per-character furigana for compound words (supersedes [US-18](#us-18)) | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
+| [US-26](#us-26) | Tune per-character furigana sizing/legibility | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
+| [US-31](#us-31) | Recognize Arabic-numeral + counter (josūshi) compounds | Dictionary | Closed | 2026-08-24 | 2026-08-24 | v2 |
+| [US-33](#us-33) | Exclude unmatched single-character katakana compounds from getting a bounding box | Captured Picture | Closed | 2026-08-24 | 2026-08-24 | v2 |
 
 <details id="us-18">
 <summary><strong>US-18 — Display vocab furigana above the characters, not below.</strong></summary>
