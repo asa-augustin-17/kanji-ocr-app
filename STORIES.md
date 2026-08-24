@@ -19,6 +19,9 @@ Groups each story by the feature area it touches. Matches the Backlog section's 
 
 ## v1 closure review (2026-08-23)
 
+<details>
+<summary>Show details</summary>
+
 **What v1 shipped, in short:** a fully offline kanji/compound scanner. Point the camera at printed Japanese and capture — every detected kanji or kanji-compound gets its own tappable bounding box drawn over the photo (pinch-zoomable/pannable for small or tightly-packed text, resuming the same zoom/pan on "Back"). Tapping a region shows the compound's reading/meaning with each constituent kanji broken out below, a "no compound match" indicator plus the same per-kanji breakdown if the compound isn't in the dictionary, a standalone kanji's on'yomi/kun'yomi/meanings, or a graceful "no dictionary entry found" message. "Back" returns to the same captured photo to pick a different region; "Scan Again" starts fresh. Everything runs on-device — no network code exists in the app at all. Katakana, hiragana, and Arabic-numeral text were explicitly out of scope (v2 added those).
 
 Went through every v1-scoped story ([US-1](#us-1)–[US-11](#us-11)) and PRD functional requirement against the current code, updating statuses where extensive on-device use during the [BUG-008](BUGS.md#bug-008)/009/010/011 investigations effectively already verified something. Two real gaps surfaced; per the user's decision, gap 1 was fixed immediately (it also removes an edge case [US-19](#us-19) would otherwise have inherited) and gap 2 was explicitly parked until [US-16](#us-16)/17's data-sourcing research:
@@ -30,7 +33,12 @@ Also worth a few quick explicit spot-checks before considering v1 fully signed o
 
 The isolated-single-kanji, low-confidence, and no-dictionary-entry spot-checks were completed and confirmed the same day — see [US-3](#us-3)/[US-5](#us-5)/[US-6](#us-6) below, all closed 2026-08-23. v1 is fully closed as of that point.
 
+</details>
+
 ## v2 closure review (2026-08-24)
+
+<details>
+<summary>Show details</summary>
 
 v2 covers everything closed after v1, all landed in a single long session. Effectively release notes — grouped by what a user would notice, not by story ID.
 
@@ -49,6 +57,8 @@ v2 covers everything closed after v1, all landed in a single long session. Effec
 **Deliberately not included in v2** — researched and logged as backlog stories, not implemented: hiragana-only word recognition ([US-32](#us-32), descoped as scope creep for the primary use case, redirected into an opt-in "book reading mode" idea, [US-35](#us-35)), conjugated verb/adjective recognition ([US-30](#us-30)), loanword etymology display ([US-28](#us-28)), a "usually written in kana" note ([US-27](#us-27)), example sentences ([US-29](#us-29)). One related open decision, not yet resolved either way: whether a multi-character *unmatched* katakana run (e.g. a random string like トズチ) should keep its current dead-end tap target or lose it too, the way single characters now do.
 
 Per-story detail and status updates are below.
+
+</details>
 
 ## Backlog (post-v1)
 
