@@ -278,7 +278,7 @@ As a learner, I want to return to the camera quickly after viewing a result, so 
 
 </details>
 
-## Enhancement requests delivered in v1
+## v1
 
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
