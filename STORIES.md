@@ -80,12 +80,12 @@ Per-story detail and status updates are below.
 
 ## Enhancement requests delivered in v1
 
-| ID | Story | Type | Status | Date Resolved | Date Added | Version |
+| ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
-| US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | — | 2026-08-23 | v1 |
+| US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | — | v1 |
 | US-10 | Resume the same zoom/pan level when backing out of a result | Captured Picture | Closed | 2026-08-23 | 2026-08-23 | v1 |
-| US-9 | Pinch-to-zoom on the captured photo | Captured Picture | Closed | 2026-08-23 | 2026-08-22 | v1 |
-| US-8 | Return to the captured photo to select a different region | Captured Picture | Closed | 2026-08-23 | 2026-08-22 | v1 |
+| US-9 | Pinch-to-zoom on the captured photo | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
+| US-8 | Return to the captured photo to select a different region | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
 
 **US-8 — Return to the captured photo to select a different region.** As a learner, when a scan detects multiple words/kanji, I want to go back to the photo I just captured after viewing one result, so that I can look up the other regions without retaking the photo.
 - A "Back" action on the results screen returns to the same captured photo with all its detected regions still tappable.
@@ -114,23 +114,23 @@ Per-story detail and status updates are below.
 
 Requested by the user on 2026-08-23 but explicitly scoped as future work, not part of v1 — logged for planning purposes only. Most of these remain unscheduled (`Backlog`), though a few (US-18, US-25, US-26) have since been completed and assigned to `v2`.
 
-| ID | Story | Type | Status | Date Resolved | Date Added | Version |
+| ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
 | US-26 | Tune per-character furigana sizing/legibility | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
 | US-25 | Per-character furigana for compound words (supersedes US-18) | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
-| US-24 | Expand vocab matching to names of people and organizations | Dictionary | Not Started | — | 2026-08-23 | Backlog |
-| US-23 | Expand vocab matching to katakana words | Dictionary | Not Started | — | 2026-08-23 | Backlog |
-| US-22 | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | — | 2026-08-23 | Backlog |
-| US-21 | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | — | 2026-08-23 | Backlog |
-| US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | — | 2026-08-23 | Backlog |
-| US-19 | Treat a single detected character as a vocab term, not just a kanji | Dictionary | Not Started | — | 2026-08-23 | Backlog |
+| US-24 | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-23 | Expand vocab matching to katakana words | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-22 | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-21 | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-19 | Treat a single detected character as a vocab term, not just a kanji | Dictionary | Not Started | 2026-08-23 | — | Backlog |
 | US-18 | Display vocab furigana above the characters, not below | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
-| US-17 | Add WaniKani level and JLPT level to the words table | Databases | Not Started | — | 2026-08-23 | Backlog |
-| US-16 | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | — | 2026-08-23 | Backlog |
-| US-15 | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | — | 2026-08-23 | Backlog |
-| US-14 | Fix the scan-overlay zoom-out "kink" (see BUG-010) | Captured Picture | Not Started | — | 2026-08-23 | Backlog |
-| US-13 | Tap to focus the camera before capturing | Camera | Not Started | — | 2026-08-23 | Backlog |
-| US-12 | Pinch-to-zoom the live camera before capturing | Camera | Not Started | — | 2026-08-23 | Backlog |
+| US-17 | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | — | Backlog |
+| US-16 | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | — | Backlog |
+| US-15 | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | — | Backlog |
+| US-14 | Fix the scan-overlay zoom-out "kink" (see BUG-010) | Captured Picture | Not Started | 2026-08-23 | — | Backlog |
+| US-13 | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | — | Backlog |
+| US-12 | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | — | Backlog |
 
 ### Camera
 
