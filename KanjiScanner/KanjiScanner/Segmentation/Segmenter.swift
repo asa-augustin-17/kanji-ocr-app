@@ -38,6 +38,18 @@ enum JapaneseText {
     static func isKatakanaConnector(_ character: Character) -> Bool {
         character == "\u{30FB}" || character == "\u{30FC}"
     }
+
+    /// True for ASCII digits 0-9 (US-31). Confirmed empirically — a small
+    /// standalone Vision script run against this app's exact production OCR
+    /// configuration (`recognitionLanguages: ["ja-JP"]`, `.accurate`,
+    /// `usesLanguageCorrection: false`) — that a printed full-width digit
+    /// (１２３...) is normalized to ASCII by OCR before this code ever sees
+    /// it, while kanji numerals (一二三...) are left untouched. So only
+    /// ASCII needs to be recognized here; a full-width digit reaching this
+    /// code at all would indicate OCR behavior has changed.
+    static func isDigit(_ character: Character) -> Bool {
+        character.isASCII && character.isNumber
+    }
 }
 
 struct SegmentToken {
@@ -51,9 +63,13 @@ struct SegmentToken {
 /// the same way (US-23): first against a katakana-only entry (surface form
 /// equal to its reading), then against a kanji-form entry whose *reading*
 /// matches, so a loanword with a legacy kanji writing in JMdict (e.g.
-/// コーヒー -> 珈琲) still resolves to that richer entry. Everything else
+/// コーヒー -> 珈琲) still resolves to that richer entry. An Arabic-numeral
+/// digit run followed by a counter (josūshi) is matched against the
+/// equivalent kanji-numeral entry (US-31, e.g. "1匹" -> 一匹), since that's
+/// almost always how JMdict actually stores these. Everything else
 /// (hiragana, punctuation, romaji) is skipped entirely — only kanji/kanji-
-/// compound and katakana-word regions are tap-to-lookup (US-2).
+/// compound, katakana-word, and numeral+counter regions are tap-to-lookup
+/// (US-2).
 enum Segmenter {
     static let maxCompoundLength = 10
 
@@ -90,6 +106,22 @@ enum Segmenter {
                     tokens.append(run)
                 }
                 index = run.range.upperBound
+                continue
+            }
+
+            if JapaneseText.isDigit(text[index]) {
+                if let match = numeralCounterMatch(in: text, from: index, database: database) {
+                    tokens.append(match)
+                    index = match.range.upperBound
+                    continue
+                }
+
+                // US-31: no fallback "unmatched" token for a bare digit run,
+                // unlike kanji/katakana — ordinary numbers (prices, page
+                // numbers, phone numbers) are common in photographed text
+                // and shouldn't become dead tap targets just because they
+                // don't happen to precede a recognized counter.
+                index = text.index(after: index)
                 continue
             }
 
@@ -147,6 +179,75 @@ enum Segmenter {
                     kanjiBreakdown: database.kanjiBreakdown(wordId: word.id)
                 )
                 return SegmentToken(range: start..<end, result: result)
+            }
+        }
+        return nil
+    }
+
+    /// Converts a run of ASCII digits to its kanji-numeral equivalent, for
+    /// matching against JMdict's kanji-numeral-form counter entries (US-31).
+    /// Deliberately limited to 0-10: real counter+number dictionary entries
+    /// are concentrated in that range (confirmed against the bundled data —
+    /// every kanji-numeral-prefixed 2-character word starts with 一 through
+    /// 十; nothing systematic beyond that for any given counter), so this
+    /// covers the overwhelming majority of real matches without the added
+    /// complexity of a general place-value converter (十/百/千 combination
+    /// rules, the leading-一 omission rule, etc.).
+    private static func smallKanjiNumeral(_ digits: String) -> String? {
+        switch digits {
+        case "0": return "〇"
+        case "1": return "一"
+        case "2": return "二"
+        case "3": return "三"
+        case "4": return "四"
+        case "5": return "五"
+        case "6": return "六"
+        case "7": return "七"
+        case "8": return "八"
+        case "9": return "九"
+        case "10": return "十"
+        default: return nil
+        }
+    }
+
+    /// Matches an Arabic-numeral digit run followed by a counter (josūshi)
+    /// against the equivalent kanji-numeral dictionary entry (US-31) — e.g.
+    /// "1匹" matches 一匹's entry, even though "1匹" itself is never the
+    /// literal `surface_form` stored in the dictionary. The returned
+    /// token's *range* covers the original digit+counter text (so the
+    /// bounding box covers what was actually printed), but `result.word`/
+    /// `kanjiBreakdown` come from the matched kanji-numeral entry — the
+    /// same split `longestKatakanaMatch` (US-23) uses for a katakana
+    /// loanword resolving to its legacy kanji entry: the range reflects
+    /// reality, the content reflects the richer match.
+    private static func numeralCounterMatch(
+        in text: String,
+        from start: String.Index,
+        database: DictionaryDatabase
+    ) -> SegmentToken? {
+        var digitsEnd = start
+        while digitsEnd < text.endIndex, JapaneseText.isDigit(text[digitsEnd]) {
+            digitsEnd = text.index(after: digitsEnd)
+        }
+        guard let numeral = smallKanjiNumeral(String(text[start..<digitsEnd])) else { return nil }
+
+        // Most counters are a single kanji; a small number are two - try
+        // the longer candidate first.
+        let remaining = text.distance(from: digitsEnd, to: text.endIndex)
+        let maxCounterLength = min(2, remaining)
+        guard maxCounterLength >= 1 else { return nil }
+
+        for counterLength in stride(from: maxCounterLength, through: 1, by: -1) {
+            let counterEnd = text.index(digitsEnd, offsetBy: counterLength)
+            let counter = String(text[digitsEnd..<counterEnd])
+            guard counter.allSatisfy(JapaneseText.isKanji) else { continue }
+            if let word = database.wordEntry(surfaceForm: numeral + counter) {
+                let result = LookupResult(
+                    token: String(text[start..<counterEnd]),
+                    word: word,
+                    kanjiBreakdown: database.kanjiBreakdown(wordId: word.id)
+                )
+                return SegmentToken(range: start..<counterEnd, result: result)
             }
         }
         return nil

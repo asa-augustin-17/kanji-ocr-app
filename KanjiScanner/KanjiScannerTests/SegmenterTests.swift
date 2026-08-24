@@ -166,4 +166,40 @@ final class SegmenterTests: XCTestCase {
         XCTAssertEqual(tokens[0].result.word?.surfaceForm, "コーヒー")
         XCTAssertEqual(tokens[1].result.word?.surfaceForm, "パソコン")
     }
+
+    func testMatchesArabicNumeralPlusCounterViaKanjiConversion() {
+        // US-31: "1匹" isn't itself a dictionary surface form, but converts
+        // to "一匹", which is - the whole "1匹" span (as actually printed)
+        // should become one tappable token resolving to that richer entry.
+        let tokens = Segmenter.segment("1匹", using: database)
+
+        XCTAssertEqual(tokens.count, 1)
+        XCTAssertEqual(tokens[0].result.token, "1匹")
+        XCTAssertEqual(tokens[0].result.word?.surfaceForm, "一匹")
+        XCTAssertEqual(tokens[0].result.word?.reading, "いっぴき")
+        XCTAssertEqual(tokens[0].result.word?.meanings, ["one (small animal)"])
+    }
+
+    func testUnmatchedDigitRunProducesNoToken() {
+        // A bare number with nothing after it (or nothing matching) should
+        // never become its own dead tap target the way an unmatched kanji
+        // or katakana run does - ordinary numbers (prices, page numbers)
+        // are common in photographed text and shouldn't be tappable noise.
+        let tokens = Segmenter.segment("42", using: database)
+
+        XCTAssertTrue(tokens.isEmpty)
+    }
+
+    func testNumeralCounterMatchWithinSentence() {
+        // "犬" (kanji, no word entry - falls back to kanji-only) + "が"
+        // (hiragana, skipped) + "1匹" (numeral+counter, matches 一匹) +
+        // "いる" (hiragana, skipped) - the numeral match shouldn't disturb
+        // segmentation of the surrounding text.
+        let tokens = Segmenter.segment("犬が1匹いる", using: database)
+
+        XCTAssertEqual(tokens.count, 2)
+        XCTAssertEqual(tokens[0].result.token, "犬")
+        XCTAssertNil(tokens[0].result.word)
+        XCTAssertEqual(tokens[1].result.word?.surfaceForm, "一匹")
+    }
 }

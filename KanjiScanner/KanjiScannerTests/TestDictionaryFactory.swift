@@ -85,6 +85,7 @@ enum TestDictionaryFactory {
             let go = try insertKanji("語", onyomi: ["ゴ"], kunyomi: ["かた.る"], meanings: ["word", "language"])
             _ = try insertKanji("犬", onyomi: [], kunyomi: ["いぬ"], meanings: ["dog"])
             let me = try insertKanji("目", onyomi: ["モク", "ボク"], kunyomi: ["め"], meanings: ["eye", "class"])
+            let hiki = try insertKanji("匹", onyomi: ["ヒツ"], kunyomi: [], meanings: ["counter for small animals"])
 
             try insertWord(
                 "漢字",
@@ -108,6 +109,12 @@ enum TestDictionaryFactory {
             // deliberately has no such entry, so it stays the regression
             // guard for "isolated kanji with no word match".
             try insertWord("目", reading: "め", meanings: ["eye"], kanjiIDs: [me])
+            // Kanji-numeral counter entry (US-31): "一匹" is its own
+            // distinct word, separate from "匹" alone (also seeded as a
+            // word below, matched via US-19's single-kanji path) - the
+            // real dictionary has both, with different meanings/readings.
+            try insertWord("一匹", reading: "いっぴき", meanings: ["one (small animal)"], kanjiIDs: [])
+            try insertWord("匹", reading: "ひき", meanings: ["counter for small animals"], kanjiIDs: [hiki])
         }
 
         return try DictionaryDatabase(path: url.path)

@@ -111,7 +111,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
 | US-32 | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | — | Backlog |
-| US-31 | Recognize Arabic-numeral + counter (josūshi) compounds | Dictionary | Implemented | 2026-08-24 | — | Backlog |
+| US-31 | Recognize Arabic-numeral + counter (josūshi) compounds | Dictionary | Closed | 2026-08-24 | 2026-08-24 | v2 |
 | US-30 | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | — | Backlog |
 | US-29 | Show example sentences on dictionary entries | Dictionary | Not Started | 2026-08-24 | — | Backlog |
 | US-28 | Show loanword etymology (source language/word) | Dictionary | Not Started | 2026-08-24 | — | Backlog |
@@ -235,7 +235,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - **Architecture:** unlike US-27/28/29, no pipeline/schema change needed — these words are already imported. Unlike US-30, this doesn't need a large rule set, just a small deterministic conversion function. Shape mirrors US-23's kanji-fallback pattern (build the richer matched entry, but keep the token's *range* over the text actually printed).
 
 **Implemented** exactly per the plan above: `JapaneseText.isDigit` (ASCII only), `smallKanjiNumeral(_:)` (0-10, including `〇`), and `numeralCounterMatch` (tries counter lengths 2 then 1, range over the original text, content from the matched kanji-numeral entry) — wired into `segment()` as a third branch alongside kanji/katakana, with no fallback token for an unmatched digit run. 6 new `SegmenterTests` cases, all passing (24/24 total). Verified against the real bundled dictionary via the Simulator debug harness: `1匹` within `犬が1匹いる` correctly resolves to `一匹`'s real entry (いっぴき, "one (small animal)", full furigana, kanji breakdown for both 一 and 匹).
-- *Implemented* — not yet confirmed on-device by the user.
+- *Closed* by the user on-device.
 
 **US-32 — Recognize hiragana-only words/expressions.** As a learner, I want a word or expression that's conventionally written entirely in hiragana (e.g. どうかしてる, "something's wrong with you") to be recognized and looked up too, not just kanji/katakana content, so that hiragana-only vocabulary doesn't hit a dead end.
 - **Research: this needs a real data source, but the picture is meaningfully riskier than US-23's katakana story, not just a variant of it.**
