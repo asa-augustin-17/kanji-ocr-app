@@ -66,24 +66,24 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 | ID | Story | Type | Status | Date Added | Version |
 |----|---|---|---|---|---|
-| [US-11](#us-11) | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | Backlog |
-| [US-12](#us-12) | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | Backlog |
-| [US-13](#us-13) | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | Backlog |
-| [US-14](#us-14) | Fix the scan-overlay zoom-out "kink" (see [BUG-010](BUGS.md#bug-010)) | Captured Picture | Not Started | 2026-08-23 | Backlog |
-| [US-15](#us-15) | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | Backlog |
-| [US-16](#us-16) | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | Backlog |
-| [US-17](#us-17) | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | Backlog |
-| [US-20](#us-20) | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-22](#us-22) | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-24](#us-24) | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | Backlog |
-| [US-27](#us-27) | Note when a word is usually written using kana alone | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-28](#us-28) | Show loanword etymology (source language/word) | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-29](#us-29) | Show example sentences on dictionary entries | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | Backlog |
-| [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Not Started | 2026-08-24 | Backlog |
-| [US-35](#us-35) | Add a "book reading mode" setting for hiragana-compound recognition | Dictionary | Not Started | 2026-08-24 | Backlog |
+| [US-11](#us-11) | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | — |
+| [US-12](#us-12) | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | — |
+| [US-13](#us-13) | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | — |
+| [US-14](#us-14) | Fix the scan-overlay zoom-out "kink" (see [BUG-010](BUGS.md#bug-010)) | Captured Picture | Not Started | 2026-08-23 | — |
+| [US-15](#us-15) | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | — |
+| [US-16](#us-16) | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | — |
+| [US-17](#us-17) | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | — |
+| [US-20](#us-20) | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — |
+| [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | — |
+| [US-22](#us-22) | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | — |
+| [US-24](#us-24) | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | — |
+| [US-27](#us-27) | Note when a word is usually written using kana alone | Dictionary | Not Started | 2026-08-24 | — |
+| [US-28](#us-28) | Show loanword etymology (source language/word) | Dictionary | Not Started | 2026-08-24 | — |
+| [US-29](#us-29) | Show example sentences on dictionary entries | Dictionary | Not Started | 2026-08-24 | — |
+| [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | — |
+| [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | — |
+| [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Not Started | 2026-08-24 | — |
+| [US-35](#us-35) | Add a "book reading mode" setting for hiragana-compound recognition | Dictionary | Not Started | 2026-08-24 | — |
 
 ### Camera
 
