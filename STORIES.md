@@ -5,7 +5,7 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 ## Status values
 - **Not Started**
 - **Implemented** — code complete, built against the acceptance criteria below
-- **Verified** — confirmed working on a physical device by the user
+- **Closed** — confirmed working on a physical device by the user
 
 A story being superseded or settled without further iteration is noted in its own detail paragraph (e.g. "Superseded by US-25") rather than as a separate status — the Status column only tracks confidence in the implementation, not whether the ID is still open to future work.
 
@@ -24,25 +24,25 @@ Per-story detail and status updates are below.
 
 | ID | Story | Status | Version |
 |----|---|---|---|
-| US-1 | Capture a photo of printed Japanese text | Verified | v1 |
-| US-2 | Select the specific text region to look up | Verified | v1 |
+| US-1 | Capture a photo of printed Japanese text | Closed | v1 |
+| US-2 | Select the specific text region to look up | Closed | v1 |
 | US-3 | View dictionary results for an isolated kanji | Implemented | v1 |
-| US-4 | View dictionary results for a kanji compound/word | Verified | v1 |
+| US-4 | View dictionary results for a kanji compound/word | Closed | v1 |
 | US-5 | Use the app with no network connection | Implemented | v1 |
 | US-6 | Handle unrecognized or low-confidence scans gracefully | Implemented | v1 |
-| US-7 | Retain the option to re-scan quickly | Verified | v1 |
+| US-7 | Retain the option to re-scan quickly | Closed | v1 |
 
 **US-1 — Capture a photo of printed Japanese text.** As a learner, I want to open the app and immediately point my camera at text, so that I can capture kanji with minimal steps.
 - App opens directly to a live camera viewfinder — no landing page, no login.
 - Tap-to-capture; camera permission requested on first launch with a clear explanation.
 - Denied permission shows a clear message directing the user to Settings.
-- *Verified on-device: capture works, image comes out upright and cropped to match the viewfinder (see BUG-001, BUG-003, BUG-004).*
+- *Closed on-device: capture works, image comes out upright and cropped to match the viewfinder (see BUG-001, BUG-003, BUG-004).*
 
 **US-2 — Select the specific text region to look up.** As a learner, I want to select the specific kanji/word I'm interested in, so that I get an accurate, targeted lookup even if other text is in frame.
 - After capture, bounding boxes overlay all detected text regions — no manual cropping step.
 - Tapping a region selects it for lookup; a single detected region auto-selects.
 - User can retake the photo if no usable text was detected.
-- *Verified on-device: tap-to-select has been exercised repeatedly and reliably across many real scans during the BUG-008/009/011 investigations (e.g. 読書感想文, 事故, 栃木県, 仕事). The specific "only one region detected → auto-selects without a tap" path hasn't been explicitly observed, though the code path is unconditional and simple — worth one quick spot-check with an image containing exactly one kanji region.*
+- *Closed on-device: tap-to-select has been exercised repeatedly and reliably across many real scans during the BUG-008/009/011 investigations (e.g. 読書感想文, 事故, 栃木県, 仕事). The specific "only one region detected → auto-selects without a tap" path hasn't been explicitly observed, though the code path is unconditional and simple — worth one quick spot-check with an image containing exactly one kanji region.*
 
 **US-3 — View dictionary results for an isolated kanji.** As a learner, I want to see the reading(s) and meaning(s) of a single kanji I've scanned, so that I understand what it means and how to say it.
 - Results show the character, on'yomi (katakana), kun'yomi (hiragana), and English meaning(s).
@@ -54,7 +54,7 @@ Per-story detail and status updates are below.
 - Compound word, reading, and meaning(s) shown at the top.
 - Each constituent kanji listed below with its own readings/meanings.
 - Falls back to kanji-level-only results (with a clear indicator) if no compound match is found.
-- *Verified on-device for the first two bullets (読書感想文, 事故, 栃木県, 仕事 all confirmed rendering correctly through the BUG-011 alignment work). Third bullet's gap **fixed**: `Segmenter` now groups a run of consecutive kanji that all fail compound-matching into one token (instead of silently fragmenting into separate single-kanji tokens), and `ResultsView` has a new `NoCompoundMatchView` state for `word == nil && kanjiBreakdown.count > 1` showing the "no compound match found" indicator plus every kanji's breakdown. The run-grouping still correctly detects a real compound starting partway through (e.g. "犬日本" still finds "日本"), covered by new unit tests. Gap #2 (FR-13's WaniKani schema column) explicitly parked — will be picked up alongside US-16/17's data-sourcing research. User-confirmed on-device.*
+- *Closed on-device for the first two bullets (読書感想文, 事故, 栃木県, 仕事 all confirmed rendering correctly through the BUG-011 alignment work). Third bullet's gap **fixed**: `Segmenter` now groups a run of consecutive kanji that all fail compound-matching into one token (instead of silently fragmenting into separate single-kanji tokens), and `ResultsView` has a new `NoCompoundMatchView` state for `word == nil && kanjiBreakdown.count > 1` showing the "no compound match found" indicator plus every kanji's breakdown. The run-grouping still correctly detects a real compound starting partway through (e.g. "犬日本" still finds "日本"), covered by new unit tests. Gap #2 (FR-13's WaniKani schema column) explicitly parked — will be picked up alongside US-16/17's data-sourcing research. User-confirmed on-device.*
 
 **US-5 — Use the app with no network connection.** As a learner, I want the app to work exactly the same on a subway with no signal or in airplane mode as it does with full connectivity, so that I never lose functionality when I need it most.
 - OCR, segmentation, and dictionary lookup all run fully on-device; no network code exists in the app.
@@ -68,28 +68,28 @@ Per-story detail and status updates are below.
 **US-7 — Retain the option to re-scan quickly.** As a learner, I want to return to the camera quickly after viewing a result, so that I can look up the next unfamiliar kanji without extra taps.
 - A single, obvious "Scan Again" action returns to the live camera view.
 - No re-granting permissions or reloading the app.
-- *Verified on-device: confirmed fast/responsive after fixing BUG-005 (previously ~5s delay).*
+- *Closed on-device: confirmed fast/responsive after fixing BUG-005 (previously ~5s delay).*
 
 ## Enhancement requests delivered in v1
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
 | US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Not Started | User request | 2026-08-23 | v1 |
-| US-10 | Resume the same zoom/pan level when backing out of a result | Verified | User request | 2026-08-23 | v1 |
-| US-9 | Pinch-to-zoom on the captured photo | Verified | User request | 2026-08-22 | v1 |
-| US-8 | Return to the captured photo to select a different region | Verified | User request | 2026-08-22 | v1 |
+| US-10 | Resume the same zoom/pan level when backing out of a result | Closed | User request | 2026-08-23 | v1 |
+| US-9 | Pinch-to-zoom on the captured photo | Closed | User request | 2026-08-22 | v1 |
+| US-8 | Return to the captured photo to select a different region | Closed | User request | 2026-08-22 | v1 |
 
 **US-8 — Return to the captured photo to select a different region.** As a learner, when a scan detects multiple words/kanji, I want to go back to the photo I just captured after viewing one result, so that I can look up the other regions without retaking the photo.
 - A "Back" action on the results screen returns to the same captured photo with all its detected regions still tappable.
 - Distinct from "Scan Again," which starts an entirely new capture.
-- *Verified on-device: used repeatedly and reliably throughout the BUG-011 alignment investigation to navigate back and re-select different kanji within the same photo.*
+- *Closed on-device: used repeatedly and reliably throughout the BUG-011 alignment investigation to navigate back and re-select different kanji within the same photo.*
 
 **US-9 — Pinch-to-zoom on the captured photo.** As a learner, I want to pinch-zoom and pan around the captured photo before selecting a region, so that I can accurately tap small or tightly-packed kanji that the app doesn't let me manually crop.
 - Pinch zooms in/out (1x–6x); drag pans once zoomed in.
 - Zoom is anchored to wherever the user's fingers are, not always the view's center (see BUG-006 for the anchor-jump issue this required fixing).
 - Detected regions' tap targets scale and pan in sync with the image.
 - Pinching back to 1x resets pan.
-- *Verified on-device: core zoom/pan/tap-target behavior confirmed working across many rounds of testing. One known, deliberately deferred limitation remains — see [BUG-010](BUGS.md)/US-14 — where zooming out while panned toward an edge has a brief "kink" in motion; doesn't block the core feature being verified.*
+- *Closed on-device: core zoom/pan/tap-target behavior confirmed working across many rounds of testing. One known, deliberately deferred limitation remains — see [BUG-010](BUGS.md)/US-14 — where zooming out while panned toward an edge has a brief "kink" in motion; doesn't block the core feature being verified.*
 
 **US-10 — Resume the same zoom/pan level when backing out of a result.** As a learner, after tapping a word/kanji and viewing its results, I want the photo to still be zoomed to where I left it when I hit "Back," so that I can quickly tap another nearby word without having to re-find and re-zoom to the same spot — since the next word I want is often right next to the one I just looked up.
 - Zoom scale and pan position from the scan overlay are preserved across a Results → Back → overlay round trip.
@@ -108,15 +108,15 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
-| US-26 | Tune per-character furigana sizing/legibility | Verified | User request | 2026-08-23 | Backlog |
-| US-25 | Per-character furigana for compound words (supersedes US-18) | Verified | User request | 2026-08-23 | Backlog |
+| US-26 | Tune per-character furigana sizing/legibility | Closed | User request | 2026-08-23 | Backlog |
+| US-25 | Per-character furigana for compound words (supersedes US-18) | Closed | User request | 2026-08-23 | Backlog |
 | US-24 | Expand vocab matching to names of people and organizations | Not Started | User request | 2026-08-23 | Backlog |
 | US-23 | Expand vocab matching to katakana words | Not Started | User request | 2026-08-23 | Backlog |
 | US-22 | Tap a kanji breakdown entry for a detail page with more tags | Not Started | User request | 2026-08-23 | Backlog |
 | US-21 | Group similar/related dictionary senses instead of one long list | Not Started | User request | 2026-08-23 | Backlog |
 | US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Not Started | User request | 2026-08-23 | Backlog |
 | US-19 | Treat a single detected character as a vocab term, not just a kanji | Not Started | User request | 2026-08-23 | Backlog |
-| US-18 | Display vocab furigana above the characters, not below | Implemented | User request | 2026-08-23 | Backlog |
+| US-18 | Display vocab furigana above the characters, not below | Closed | User request | 2026-08-23 | Backlog |
 | US-17 | Add WaniKani level and JLPT level to the words table | Not Started | User request | 2026-08-23 | Backlog |
 | US-16 | Add WaniKani level and Jōyō status to the kanji table | Not Started | User request | 2026-08-23 | Backlog |
 | US-15 | Smooth, decaying scroll deceleration on the captured photo | Not Started | User request | 2026-08-23 | Backlog |
@@ -160,18 +160,18 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 **US-18 — Display vocab furigana above the characters, not below.** As a learner, I want the reading of a compound word shown as furigana directly above its kanji (as it appears in real printed Japanese), so that the results screen reads the way native materials actually present readings, rather than as a separate line underneath.
 - Currently the word's reading is shown as a full separate line below the surface form (`WordSection` in `ResultsView.swift`), not per-character ruby-style furigana above each kanji.
-- Implemented first as whole-word furigana (the reading centered above the entire surface form, since JMdict only provides one reading per word with no per-kanji alignment data). On review, the user determined this wasn't sufficient for mixed kanji/kana compounds (e.g. 生み心地) — a single reading spanning multiple characters doesn't help a learner tell which reading belongs to which kanji. **Superseded by US-25**, which solves the actual per-character alignment problem — not receiving further iteration under this ID. The whole-word rendering built here (`WholeWordFuriganaText` in `ResultsView.swift`) survives as US-25's fallback for words outside its data source's coverage.
+- *Closed.* Implemented first as whole-word furigana (the reading centered above the entire surface form, since JMdict only provides one reading per word with no per-kanji alignment data). On review, the user determined this wasn't sufficient for mixed kanji/kana compounds (e.g. 生み心地) — a single reading spanning multiple characters doesn't help a learner tell which reading belongs to which kanji. Per the user's explicit instruction, closed in favor of **US-25**, which solves the actual per-character alignment problem. The whole-word rendering built here (`WholeWordFuriganaText` in `ResultsView.swift`) survives as US-25's fallback for words outside its data source's coverage.
 
 **US-25 — Per-character furigana for compound words (supersedes US-18).** As a learner, when I look up a compound word that mixes kanji and kana (e.g. 生み心地), I want the furigana reading split and positioned over each individual kanji (or kanji run), the way real printed Japanese and tools like Yomitan do, so that I can tell which reading belongs to which character and actually learn the word instead of just seeing one undifferentiated reading string above it.
 - JMdict itself has no per-kanji reading alignment data, so this required a new external data source: [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana) (CC BY-SA, same license family as JMdict/KANJIDIC2), bundled into `data-pipeline/build_dictionary.py` and joined to `words` by `(surface_form, reading)` into a new `furigana_segments` column. Covers 221,811 of 230,958 words in the bundled dictionary (96%); the remaining ~4% fall back to US-18's whole-word furigana.
 - Rendered via a new `SegmentedFuriganaText` view in `ResultsView.swift`: a plain SwiftUI `HStack(alignment: .bottom)` of per-run mini-`VStack`s (small reading above + big characters below, or just the bare characters for a run that's already kana), rather than CoreText's `CTRubyAnnotation` — deliberately kept to plain SwiftUI, consistent with this codebase's preference for simple explicit layout over clever/measured layout (see BUG-011's saga in BUGS.md).
 - Correctly groups jukujikun (irregular readings spanning multiple kanji as one indivisible unit, e.g. 大人 → おとな within 大人買い) as a single run rather than forcing one kanji per segment, matching how the source data itself segments these.
-- *Verified* on-device ("This is a pass"). Follow-up sizing/legibility tuning (the reading font was bumped once already, `.caption2` → `.caption`, per user feedback that jukujikun readings looked too small) is tracked separately as **US-26** — not receiving further iteration under this ID.
+- *Closed* on-device ("This is a pass"). Follow-up sizing/legibility tuning (the reading font was bumped once already, `.caption2` → `.caption`, per user feedback that jukujikun readings looked too small) is tracked separately as **US-26** — not receiving further iteration under this ID.
 
 **US-26 — Tune per-character furigana sizing/legibility.** As a learner, after getting true per-character furigana (US-25), I want its size/legibility kept tunable and refined further, so that readings stay comfortably legible across different words and screen sizes rather than settling permanently on whatever size shipped first.
 - Direct follow-up to US-25: the reading font was bumped once (`Font.caption2` → `Font.caption`) after the user found jukujikun readings (e.g. おとな over 大人) too small, but that didn't fully close the gap — comparing 住居/すまい (which has no JmdictFurigana per-character data, so renders via `WholeWordFuriganaText`'s `.subheadline` font) against 住い/すまい (which does have per-character data, rendering via `SegmentedFuriganaText`, still at `.caption`) showed the two paths were visibly inconsistent in size.
 - Fixed by setting `SegmentedFuriganaText`'s reading font to `.subheadline`, matching `WholeWordFuriganaText` exactly — both furigana rendering paths now use the same size.
-- *Verified* by the user on-device.
+- *Closed* by the user on-device.
 
 **US-19 — Treat a single detected character as a vocab term, not just a kanji.** As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.
 - Today, per FR-15/US-3, a single-kanji selection always shows the isolated-kanji detail view (`KanjiDetailView`) — it never checks whether that single character is *also* a `words` table entry in its own right.
