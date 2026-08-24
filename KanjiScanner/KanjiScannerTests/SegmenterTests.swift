@@ -100,6 +100,17 @@ final class SegmenterTests: XCTestCase {
         XCTAssertFalse(tokens[0].result.hasEntry)
     }
 
+    func testSingleUnmatchedKatakanaCharacterProducesNoToken() {
+        // US-33: a lone unmatched katakana character (e.g. ト) shouldn't get
+        // a tappable "no dictionary entry found" region at all - unlike a
+        // multi-character run (testUnmatchedKatakanaRunProducesNoEntryResult
+        // above), which still should, and unlike a single unmatched *kanji*
+        // (US-6's original behavior, deliberately unchanged).
+        let tokens = Segmenter.segment("ト", using: database)
+
+        XCTAssertTrue(tokens.isEmpty)
+    }
+
     func testKatakanaWordAmongMixedKanjiAndHiraganaText() {
         // "私" (unseeded kanji) + "は...です" (hiragana, skipped) +
         // "コーヒー" (katakana word) — the katakana word should be found

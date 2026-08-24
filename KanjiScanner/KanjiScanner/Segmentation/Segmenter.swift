@@ -102,7 +102,16 @@ enum Segmenter {
                 // BUG-012: a run made up entirely of ・/ー (no actual
                 // katakana letters) isn't a word - skip it like any other
                 // non-katakana punctuation, rather than making it tappable.
-                if !run.result.token.allSatisfy(JapaneseText.isKatakanaConnector) {
+                // US-33: a single unmatched katakana character (e.g. ト)
+                // also isn't worth a dead "no dictionary entry found" tap
+                // target - unlike a lone kanji, which often *is* a real
+                // standalone word (US-19's whole point), a lone katakana
+                // mora essentially never stands alone as vocabulary; it's
+                // almost always an OCR fragment of a longer word. Deliberately
+                // scoped to katakana only - a single unmatched *kanji*
+                // keeps showing "no dictionary entry found", per US-6's
+                // original v1 acceptance criterion, left unchanged here.
+                if run.result.token.count > 1 && !run.result.token.allSatisfy(JapaneseText.isKatakanaConnector) {
                     tokens.append(run)
                 }
                 index = run.range.upperBound
@@ -303,14 +312,15 @@ enum Segmenter {
 
     /// A contiguous run of katakana starting at `start` with no dictionary
     /// match at any position within it (US-23) — mirrors `unmatchedKanjiRun`'s
-    /// run-grouping so the whole run becomes one tappable "no dictionary
-    /// entry found" region (US-6) instead of being silently skipped. Unlike
-    /// kanji, there's no per-character breakdown to fall back to here —
-    /// individual katakana characters aren't dictionary entries the way
-    /// individual kanji are — so this always resolves to `hasEntry == false`.
-    /// The caller (BUG-012) discards the result instead of appending it when
-    /// the whole run turns out to be nothing but ・/ー connectors — this
-    /// function itself doesn't know that policy, it just reports the range.
+    /// run-grouping so a multi-character run becomes one tappable "no
+    /// dictionary entry found" region (US-6) instead of being silently
+    /// skipped. Unlike kanji, there's no per-character breakdown to fall
+    /// back to here — individual katakana characters aren't dictionary
+    /// entries the way individual kanji are — so this always resolves to
+    /// `hasEntry == false`. The caller discards the result instead of
+    /// appending it when the whole run is nothing but ・/ー connectors
+    /// (BUG-012) or is exactly one character (US-33, e.g. ト) — this
+    /// function itself doesn't know either policy, it just reports the range.
     ///
     /// Same early-stop behavior as `unmatchedKanjiRun`: the run stops as soon
     /// as a match would start at a later position, so a genuine word partway
