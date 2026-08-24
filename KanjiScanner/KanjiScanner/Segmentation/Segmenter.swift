@@ -39,20 +39,15 @@ enum Segmenter {
                 continue
             }
 
-            let remaining = text.distance(from: index, to: text.endIndex)
-            let upperBound = min(maxCompoundLength, remaining)
-
-            if let match = longestCompoundMatch(in: text, from: index, upperBound: upperBound, database: database) {
+            if let match = longestCompoundMatch(in: text, from: index, database: database) {
                 tokens.append(match)
                 index = match.range.upperBound
                 continue
             }
 
-            let end = text.index(after: index)
-            let candidate = String(text[index])
-            let result = database.lookup(token: candidate)
-            tokens.append(SegmentToken(range: index..<end, result: result))
-            index = end
+            let run = unmatchedKanjiRun(in: text, from: index, database: database)
+            tokens.append(run)
+            index = run.range.upperBound
         }
 
         return tokens
@@ -61,9 +56,9 @@ enum Segmenter {
     private static func longestCompoundMatch(
         in text: String,
         from start: String.Index,
-        upperBound: Int,
         database: DictionaryDatabase
     ) -> SegmentToken? {
+        let upperBound = maxMatchLength(in: text, from: start)
         guard upperBound >= 2 else { return nil }
 
         for length in stride(from: upperBound, through: 2, by: -1) {
@@ -79,5 +74,46 @@ enum Segmenter {
             }
         }
         return nil
+    }
+
+    /// A contiguous run of kanji starting at `start`, none of which begins a
+    /// valid compound — i.e. every position in the run already failed (or
+    /// would fail) `longestCompoundMatch` by the time it's included. Grouping
+    /// these into one token — instead of fragmenting each into its own
+    /// separate, unlabeled single-kanji region — lets the results screen show
+    /// "no compound match found" alongside every kanji's own breakdown
+    /// together (US-4's fallback acceptance criterion, previously
+    /// unreachable since segmentation never produced a multi-kanji token
+    /// without a word match).
+    ///
+    /// The run still stops as soon as a compound would match starting at a
+    /// later kanji, so a genuine compound partway through an otherwise
+    /// non-dictionary run (e.g. "犬日本" where "日本" matches) is still
+    /// found correctly on the next iteration of the outer loop.
+    private static func unmatchedKanjiRun(
+        in text: String,
+        from start: String.Index,
+        database: DictionaryDatabase
+    ) -> SegmentToken {
+        var end = start
+        var entries: [KanjiEntry] = []
+
+        while end < text.endIndex,
+              JapaneseText.isKanji(text[end]),
+              text.distance(from: start, to: end) < maxCompoundLength,
+              longestCompoundMatch(in: text, from: end, database: database) == nil {
+            if let entry = database.kanjiEntry(character: String(text[end])) {
+                entries.append(entry)
+            }
+            end = text.index(after: end)
+        }
+
+        let token = String(text[start..<end])
+        let result = LookupResult(token: token, word: nil, kanjiBreakdown: entries)
+        return SegmentToken(range: start..<end, result: result)
+    }
+
+    private static func maxMatchLength(in text: String, from start: String.Index) -> Int {
+        min(maxCompoundLength, text.distance(from: start, to: text.endIndex))
     }
 }

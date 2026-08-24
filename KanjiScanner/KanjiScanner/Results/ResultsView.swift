@@ -2,10 +2,12 @@ import SwiftUI
 
 /// Displays a lookup result: for a compound, the word first with its
 /// constituent kanji broken out below (US-4, FR-14); for an isolated kanji,
-/// just the character detail (US-3, FR-15) — mirroring Yomitan's pop-up
-/// dictionary pattern. "Back" returns to the same captured photo so the
-/// user can pick another detected region; "Scan Again" starts a fresh
-/// capture (US-7, FR-16).
+/// just the character detail (US-3, FR-15); for a multi-kanji span that
+/// isn't a recognized compound, a "no compound match" indicator plus each
+/// kanji's own breakdown (US-4's fallback acceptance criterion) — mirroring
+/// Yomitan's pop-up dictionary pattern. "Back" returns to the same captured
+/// photo so the user can pick another detected region; "Scan Again" starts
+/// a fresh capture (US-7, FR-16).
 struct ResultsView: View {
     let result: LookupResult
     var onBack: () -> Void
@@ -30,6 +32,9 @@ struct ResultsView: View {
                         }
                     } else if result.kanjiBreakdown.count == 1 {
                         KanjiDetailView(entry: result.kanjiBreakdown[0])
+                    } else if result.kanjiBreakdown.count > 1 {
+                        NoCompoundMatchView(token: result.token)
+                        KanjiBreakdownSection(entries: result.kanjiBreakdown)
                     } else if !result.hasEntry {
                         NoMatchView(token: result.token)
                     }
@@ -48,6 +53,25 @@ struct ResultsView: View {
             }
             .buttonStyle(.borderedProminent)
             .padding()
+        }
+    }
+}
+
+/// Shown in place of `WordSection` when a multi-kanji span was scanned but
+/// no compound match was found for it in the dictionary — the constituent
+/// kanji are still shown individually via `KanjiBreakdownSection` right
+/// below this (US-4's "falls back to kanji-level results... with a clear
+/// indicator" acceptance criterion).
+private struct NoCompoundMatchView: View {
+    let token: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(token)
+                .font(.system(size: 48, weight: .bold))
+            Label("No compound match found", systemImage: "exclamationmark.triangle")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 }

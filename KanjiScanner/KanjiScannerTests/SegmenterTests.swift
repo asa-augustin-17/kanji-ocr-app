@@ -42,4 +42,28 @@ final class SegmenterTests: XCTestCase {
         XCTAssertEqual(tokens.count, 1)
         XCTAssertFalse(tokens[0].result.hasEntry)
     }
+
+    func testConsecutiveUnmatchedKanjiAreGroupedIntoOneToken() {
+        // "本" and "犬" are each individually seeded, but "本犬" itself is
+        // not a word — should be one token covering both characters, not
+        // two separate single-kanji tokens (US-4's fallback AC).
+        let tokens = Segmenter.segment("本犬", using: database)
+
+        XCTAssertEqual(tokens.count, 1)
+        XCTAssertNil(tokens[0].result.word)
+        XCTAssertEqual(tokens[0].result.token, "本犬")
+        XCTAssertEqual(tokens[0].result.kanjiBreakdown.map(\.character), ["本", "犬"])
+    }
+
+    func testUnmatchedRunStopsBeforeARealCompoundStartingLater() {
+        // "犬" alone doesn't start a compound, but "日本" (right after it)
+        // does — the unmatched run should stop at "犬" rather than
+        // swallowing "日" into it, so "日本" still gets found separately.
+        let tokens = Segmenter.segment("犬日本", using: database)
+
+        XCTAssertEqual(tokens.count, 2)
+        XCTAssertNil(tokens[0].result.word)
+        XCTAssertEqual(tokens[0].result.kanjiBreakdown.map(\.character), ["犬"])
+        XCTAssertEqual(tokens[1].result.word?.surfaceForm, "日本")
+    }
 }
