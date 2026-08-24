@@ -20,6 +20,10 @@ OUTPUT = HERE / "output"
 DB_PATH = OUTPUT / "kanji_scanner.sqlite"
 
 KANJI_RE = re.compile(r"[一-鿿㐀-䶿]")
+# Full-width Katakana Unicode block (U+30A0-U+30FF) - matches the range
+# `JapaneseText.isKatakana` checks in the app, so pipeline import and
+# on-device segmentation agree on what counts as katakana (US-23).
+KATAKANA_RE = re.compile(r"^[゠-ヿ]+$")
 
 # Standard JMdict "common word" priority markers (jmdict-simplified convention).
 COMMON_MARKERS = {"news1", "ichi1", "spec1", "spec2", "gai1"}
@@ -56,6 +60,7 @@ CREATE TABLE word_kanji_map (
 
 CREATE INDEX idx_kanji_character ON kanji(character);
 CREATE INDEX idx_words_surface_form ON words(surface_form);
+CREATE INDEX idx_words_reading ON words(reading);
 CREATE INDEX idx_word_kanji_map_word_position ON word_kanji_map(word_id, position);
 """
 
@@ -113,18 +118,14 @@ def parse_kanjidic2(path):
 
 
 def parse_jmdict(path):
-    """Yields dicts of word field data (one per kanji surface form), streaming."""
+    """Yields dicts of word field data - one per kanji surface form, or (US-23)
+    one per kana-only entry whose reading is pure katakana, streaming."""
     context = ET.iterparse(path, events=("end",))
     for event, elem in context:
         if elem.tag != "entry":
             continue
 
         k_eles = elem.findall("k_ele")
-        if not k_eles:
-            # Kana-only entries are out of scope: the app looks up kanji/compounds.
-            elem.clear()
-            continue
-
         r_eles = elem.findall("r_ele")
 
         meanings = []
@@ -140,6 +141,25 @@ def parse_jmdict(path):
                         meanings.append(gloss.text)
 
         part_of_speech = "; ".join(pos_set) if pos_set else None
+
+        if not k_eles:
+            # Kana-only entry (US-23): surface it as a katakana word - the
+            # reading itself becomes the surface_form, since there's no
+            # separate kanji writing. Loanwords/onomatopoeia are almost
+            # always pure katakana; hiragana-only entries (native words with
+            # no kanji form) remain out of scope for now.
+            reb = r_eles[0].findtext("reb") if r_eles else None
+            if reb and KATAKANA_RE.match(reb):
+                re_pri = {p.text for p in r_eles[0].findall("re_pri")}
+                yield {
+                    "surface_form": reb,
+                    "reading": reb,
+                    "meanings": meanings,
+                    "part_of_speech": part_of_speech,
+                    "is_common": bool(re_pri & COMMON_MARKERS),
+                }
+            elem.clear()
+            continue
 
         for k_ele in k_eles:
             surface_form = k_ele.findtext("keb")

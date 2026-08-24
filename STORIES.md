@@ -119,7 +119,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | US-26 | Tune per-character furigana sizing/legibility | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
 | US-25 | Per-character furigana for compound words (supersedes US-18) | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
 | US-24 | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | — | Backlog |
-| US-23 | Expand vocab matching to katakana words | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-23 | Expand vocab matching to katakana words | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v2 |
 | US-22 | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | — | Backlog |
 | US-21 | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | — | Backlog |
 | US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — | Backlog |
@@ -200,9 +200,13 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - Depends on US-16 for Jōyō/WaniKani fields existing at all.
 - *Not started.*
 
-**US-23 — Expand vocab matching to katakana words.** As a learner, I want katakana words (loanwords, onomatopoeia, etc.) to be recognized and looked up too, not just kanji and kanji compounds, so that I don't hit a dead end scanning text that's partly or fully katakana.
+**US-23 — Expand vocab matching to katakana words.** As a learner, I want katakana words (loanwords, onomatopoeia, etc.) to be recognized and looked up too, not just kanji and kanji compounds, so that I don't hit a dead end scanning text that's partly or fully katakana. If a katakana word I scan also has a kanji form in the dictionary (e.g. コーヒー/珈琲), I want it to resolve to that same, richer kanji entry — reading and kanji breakdown included — rather than treating the katakana spelling as a dead end just because it isn't the "primary" written form.
 - Current segmentation (`Segmenter.swift`) and dictionary import (`build_dictionary.py`'s kanji-only filter) are deliberately scoped to kanji/kanji-compounds only, per the PRD's v1 non-goals — this is an explicit expansion beyond that original scope.
-- *Not started.*
+- **AC1 (katakana-only words):** `build_dictionary.py` now also imports JMdict's kana-only entries (previously skipped entirely) whose reading is pure katakana — loanwords/onomatopoeia — using the reading itself as `surface_form` since there's no separate kanji writing; hiragana-only entries remain out of scope. Added 37,686 words (231k → 269k), coverage confirmed against real loanwords (パソコン, タクシー, ホテル, パン).
+- **AC2 (kanji-fallback for katakana spellings of kanji words):** a katakana word with no katakana-only entry of its own, but whose reading matches a distinct kanji-form entry (e.g. コーヒー is only in JMdict as 珈琲's reading, not as its own kana-only entry), resolves to that kanji entry — same full breakdown a learner would get by scanning 珈琲 directly. New `DictionaryDatabase.wordEntry(reading:)` (indexed via `idx_words_reading`) restricted to `surface_form != reading` so it only ever surfaces genuine kanji entries, not duplicate katakana-only ones. `Segmenter`'s new `longestKatakanaMatch` tries an exact surface-form match first, then this reading fallback, at each candidate length.
+- **AC3 (segmentation):** `Segmenter.swift` gained `JapaneseText.isKatakana` and matches katakana runs with the same longest-match-first strategy already used for kanji. An unmatched katakana run still becomes one tappable "no dictionary entry found" region (US-6), mirroring `unmatchedKanjiRun`, but without a per-character breakdown (individual katakana characters aren't dictionary entries).
+- **AC4 (display):** `ResultsView.swift`'s `WordSection` skips furigana entirely when a word's surface form already equals its reading (true for every katakana-only entry, not for kanji-fallback matches like 珈琲) — showing the identical string as ruby text above itself would be redundant, and real printed Japanese never glosses katakana this way.
+- *Closed.* User-confirmed working.
 
 **US-24 — Expand vocab matching to names of people and organizations.** As a learner, I want proper nouns (people's names, company/organization names) to resolve to a dictionary entry when possible, instead of always hitting "no dictionary entry found," so that I'm not stuck on names I encounter while reading.
 - JMdict itself excludes most proper nouns; this would likely need EDRDG's separate `ENAMDICT`/`JMnedict` name dictionary as an additional data source in the build pipeline.

@@ -66,4 +66,62 @@ final class SegmenterTests: XCTestCase {
         XCTAssertEqual(tokens[0].result.kanjiBreakdown.map(\.character), ["犬"])
         XCTAssertEqual(tokens[1].result.word?.surfaceForm, "日本")
     }
+
+    func testMatchesKatakanaWord() {
+        // US-23: a katakana loanword should be looked up the same way a
+        // kanji compound is, even with no kanji involved at all.
+        let tokens = Segmenter.segment("コーヒー", using: database)
+
+        XCTAssertEqual(tokens.count, 1)
+        XCTAssertEqual(tokens[0].result.word?.surfaceForm, "コーヒー")
+        XCTAssertEqual(tokens[0].result.word?.meanings, ["coffee"])
+    }
+
+    func testUnmatchedKatakanaRunProducesNoEntryResult() {
+        // A katakana run not seeded in the test database should still become
+        // one tappable token resolving to "no dictionary entry found"
+        // (US-6), not be silently skipped like hiragana/romaji are.
+        let tokens = Segmenter.segment("メロン", using: database)
+
+        XCTAssertEqual(tokens.count, 1)
+        XCTAssertEqual(tokens[0].result.token, "メロン")
+        XCTAssertFalse(tokens[0].result.hasEntry)
+    }
+
+    func testKatakanaWordAmongMixedKanjiAndHiraganaText() {
+        // "私" (unseeded kanji) + "は...です" (hiragana, skipped) +
+        // "コーヒー" (katakana word) — the katakana word should be found
+        // alongside the kanji token, not swallowed or skipped.
+        let tokens = Segmenter.segment("私はコーヒーです", using: database)
+
+        XCTAssertEqual(tokens.count, 2)
+        XCTAssertEqual(tokens[0].result.token, "私")
+        XCTAssertEqual(tokens[1].result.word?.surfaceForm, "コーヒー")
+    }
+
+    func testKatakanaWordFallsBackToKanjiEntryByReading() {
+        // US-23's kanji-fallback: "タバコ" has no katakana-only entry of its
+        // own, but "煙草" (seeded with reading タバコ) does — scanning the
+        // katakana spelling should still surface the richer kanji entry
+        // (real-world equivalent: コーヒー -> 珈琲), not "no entry found".
+        let tokens = Segmenter.segment("タバコ", using: database)
+
+        XCTAssertEqual(tokens.count, 1)
+        XCTAssertEqual(tokens[0].result.word?.surfaceForm, "煙草")
+        XCTAssertEqual(tokens[0].result.word?.reading, "タバコ")
+        XCTAssertEqual(tokens[0].result.word?.meanings, ["tobacco", "cigarette"])
+    }
+
+    func testKatakanaOnlyEntryTakesPriorityOverReadingFallback() {
+        // When both a direct katakana-only entry and a same-length
+        // reading-fallback candidate could apply, the direct surface-form
+        // match should win (it's already covered by testMatchesKatakanaWord
+        // finding "コーヒー" itself; this asserts the fallback doesn't
+        // accidentally take over even though `wordEntry(reading:)` would
+        // never match here, since コーヒー's own entry has surface_form ==
+        // reading and is excluded from the fallback query by design).
+        let tokens = Segmenter.segment("コーヒー", using: database)
+
+        XCTAssertEqual(tokens[0].result.word?.surfaceForm, "コーヒー")
+    }
 }

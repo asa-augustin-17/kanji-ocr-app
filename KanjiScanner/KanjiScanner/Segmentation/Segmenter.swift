@@ -14,6 +14,18 @@ enum JapaneseText {
             return false
         }
     }
+
+    /// True for the full-width Katakana Unicode block (U+30A0-U+30FF, which
+    /// includes the long vowel mark ー and word-separator ・) - matches the
+    /// range `build_dictionary.py`'s `KATAKANA_RE` uses when importing
+    /// kana-only JMdict entries as katakana words (US-23), so pipeline import
+    /// and on-device segmentation agree on what counts as katakana.
+    static func isKatakana(_ character: Character) -> Bool {
+        guard character.unicodeScalars.count == 1, let scalar = character.unicodeScalars.first else {
+            return false
+        }
+        return (0x30A0...0x30FF).contains(scalar.value)
+    }
 }
 
 struct SegmentToken {
@@ -23,9 +35,13 @@ struct SegmentToken {
 
 /// Segments OCR'd text into lookup tokens, prioritizing the longest valid
 /// dictionary compound starting at each kanji, falling back to single-kanji
-/// lookup when no compound matches (FR-8, FR-9). Non-kanji characters (kana,
-/// punctuation, romaji) are skipped entirely — v1 only surfaces kanji and
-/// kanji-compound regions for tap-to-lookup (US-2).
+/// lookup when no compound matches (FR-8, FR-9). Katakana runs are matched
+/// the same way (US-23): first against a katakana-only entry (surface form
+/// equal to its reading), then against a kanji-form entry whose *reading*
+/// matches, so a loanword with a legacy kanji writing in JMdict (e.g.
+/// コーヒー -> 珈琲) still resolves to that richer entry. Everything else
+/// (hiragana, punctuation, romaji) is skipped entirely — only kanji/kanji-
+/// compound and katakana-word regions are tap-to-lookup (US-2).
 enum Segmenter {
     static let maxCompoundLength = 10
 
@@ -34,20 +50,33 @@ enum Segmenter {
         var index = text.startIndex
 
         while index < text.endIndex {
-            guard JapaneseText.isKanji(text[index]) else {
-                index = text.index(after: index)
+            if JapaneseText.isKanji(text[index]) {
+                if let match = longestCompoundMatch(in: text, from: index, database: database) {
+                    tokens.append(match)
+                    index = match.range.upperBound
+                    continue
+                }
+
+                let run = unmatchedKanjiRun(in: text, from: index, database: database)
+                tokens.append(run)
+                index = run.range.upperBound
                 continue
             }
 
-            if let match = longestCompoundMatch(in: text, from: index, database: database) {
-                tokens.append(match)
-                index = match.range.upperBound
+            if JapaneseText.isKatakana(text[index]) {
+                if let match = longestKatakanaMatch(in: text, from: index, database: database) {
+                    tokens.append(match)
+                    index = match.range.upperBound
+                    continue
+                }
+
+                let run = unmatchedKatakanaRun(in: text, from: index, database: database)
+                tokens.append(run)
+                index = run.range.upperBound
                 continue
             }
 
-            let run = unmatchedKanjiRun(in: text, from: index, database: database)
-            tokens.append(run)
-            index = run.range.upperBound
+            index = text.index(after: index)
         }
 
         return tokens
@@ -65,6 +94,36 @@ enum Segmenter {
             let end = text.index(start, offsetBy: length)
             let candidate = String(text[start..<end])
             if let word = database.wordEntry(surfaceForm: candidate) {
+                let result = LookupResult(
+                    token: candidate,
+                    word: word,
+                    kanjiBreakdown: database.kanjiBreakdown(wordId: word.id)
+                )
+                return SegmentToken(range: start..<end, result: result)
+            }
+        }
+        return nil
+    }
+
+    /// Same longest-match-first search as `longestCompoundMatch`, but for a
+    /// katakana run: tries an exact surface-form match first, then (US-23's
+    /// kanji-fallback) a reading match against words with a distinct kanji
+    /// surface form — so コーヒー, which has no katakana-only entry of its
+    /// own, still resolves to 珈琲's entry instead of "no dictionary entry
+    /// found". Surface-form match wins when both would match at the same
+    /// length, since it's the more direct hit.
+    private static func longestKatakanaMatch(
+        in text: String,
+        from start: String.Index,
+        database: DictionaryDatabase
+    ) -> SegmentToken? {
+        let upperBound = maxMatchLength(in: text, from: start)
+        guard upperBound >= 2 else { return nil }
+
+        for length in stride(from: upperBound, through: 2, by: -1) {
+            let end = text.index(start, offsetBy: length)
+            let candidate = String(text[start..<end])
+            if let word = database.wordEntry(surfaceForm: candidate) ?? database.wordEntry(reading: candidate) {
                 let result = LookupResult(
                     token: candidate,
                     word: word,
@@ -110,6 +169,37 @@ enum Segmenter {
 
         let token = String(text[start..<end])
         let result = LookupResult(token: token, word: nil, kanjiBreakdown: entries)
+        return SegmentToken(range: start..<end, result: result)
+    }
+
+    /// A contiguous run of katakana starting at `start` with no dictionary
+    /// match at any position within it (US-23) — mirrors `unmatchedKanjiRun`'s
+    /// run-grouping so the whole run becomes one tappable "no dictionary
+    /// entry found" region (US-6) instead of being silently skipped. Unlike
+    /// kanji, there's no per-character breakdown to fall back to here —
+    /// individual katakana characters aren't dictionary entries the way
+    /// individual kanji are — so this always resolves to `hasEntry == false`.
+    ///
+    /// Same early-stop behavior as `unmatchedKanjiRun`: the run stops as soon
+    /// as a match would start at a later position, so a genuine word partway
+    /// through an otherwise-unmatched run is still found on the next
+    /// iteration of the outer loop.
+    private static func unmatchedKatakanaRun(
+        in text: String,
+        from start: String.Index,
+        database: DictionaryDatabase
+    ) -> SegmentToken {
+        var end = start
+
+        while end < text.endIndex,
+              JapaneseText.isKatakana(text[end]),
+              text.distance(from: start, to: end) < maxCompoundLength,
+              longestKatakanaMatch(in: text, from: end, database: database) == nil {
+            end = text.index(after: end)
+        }
+
+        let token = String(text[start..<end])
+        let result = LookupResult(token: token, word: nil, kanjiBreakdown: [])
         return SegmentToken(range: start..<end, result: result)
     }
 

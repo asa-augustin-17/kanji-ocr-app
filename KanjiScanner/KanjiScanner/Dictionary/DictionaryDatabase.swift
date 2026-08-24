@@ -43,6 +43,27 @@ final class DictionaryDatabase {
         }
     }
 
+    /// Exact-match word lookup by reading, restricted to entries with a
+    /// distinct kanji surface form (US-23's kanji-fallback): a katakana word
+    /// that's only written in katakana in real usage but has a legacy kanji
+    /// form in JMdict (e.g. コーヒー's reading also belongs to 珈琲) resolves
+    /// to that richer kanji entry instead of "no dictionary entry found".
+    /// `surface_form != reading` excludes katakana-only entries, which are
+    /// already found directly via `wordEntry(surfaceForm:)` and shouldn't
+    /// surface here too.
+    func wordEntry(reading: String) -> WordEntry? {
+        try? dbQueue.read { db in
+            try WordEntry.fetchOne(
+                db,
+                sql: """
+                SELECT * FROM words WHERE reading = ? AND surface_form != reading
+                ORDER BY is_common DESC LIMIT 1
+                """,
+                arguments: [reading]
+            )
+        }
+    }
+
     /// Constituent kanji for a word, in on-page order (FR-12, US-4).
     func kanjiBreakdown(wordId: Int64) -> [KanjiEntry] {
         (try? dbQueue.read { db in

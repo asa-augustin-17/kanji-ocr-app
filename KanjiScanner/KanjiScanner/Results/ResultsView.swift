@@ -81,13 +81,20 @@ private struct NoCompoundMatchView: View {
 /// positioned per-character/per-run rather than as one line spanning the
 /// whole word (US-25) whenever `word.furiganaSegments` has that alignment
 /// data; otherwise it falls back to the whole-word furigana US-18 shipped
-/// first, for the small fraction of words JmdictFurigana doesn't cover.
+/// first, for the small fraction of words JmdictFurigana doesn't cover. A
+/// katakana word (US-23) has no separate kanji writing — its surface form
+/// *is* its reading — so real printed Japanese never glosses it with
+/// furigana; showing the identical string as ruby text above itself would
+/// just be visual noise, so that case skips furigana entirely.
 private struct WordSection: View {
     let word: WordEntry
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let segments = word.furiganaSegments, !segments.isEmpty {
+            if word.surfaceForm == word.reading {
+                Text(word.surfaceForm)
+                    .font(.system(size: 48, weight: .bold))
+            } else if let segments = word.furiganaSegments, !segments.isEmpty {
                 SegmentedFuriganaText(segments: segments)
             } else {
                 WholeWordFuriganaText(surfaceForm: word.surfaceForm, reading: word.reading)

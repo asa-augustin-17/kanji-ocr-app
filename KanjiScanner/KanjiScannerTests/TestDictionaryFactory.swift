@@ -43,6 +43,7 @@ enum TestDictionaryFactory {
                 );
                 CREATE INDEX idx_kanji_character ON kanji(character);
                 CREATE INDEX idx_words_surface_form ON words(surface_form);
+                CREATE INDEX idx_words_reading ON words(reading);
                 CREATE INDEX idx_word_kanji_map_word_position ON word_kanji_map(word_id, position);
                 """)
 
@@ -96,6 +97,11 @@ enum TestDictionaryFactory {
             )
             try insertWord("日本語", reading: "にほんご", meanings: ["Japanese language"], kanjiIDs: [nichi, hon, go])
             try insertWord("日本", reading: "にほん", meanings: ["Japan"], kanjiIDs: [nichi, hon])
+            try insertWord("コーヒー", reading: "コーヒー", meanings: ["coffee"], kanjiIDs: [])
+            // Kanji-form entry with no matching katakana-only entry of its
+            // own — exercises the US-23 reading-fallback path (real-world
+            // equivalent: 珈琲/コーヒー).
+            try insertWord("煙草", reading: "タバコ", meanings: ["tobacco", "cigarette"], kanjiIDs: [])
         }
 
         return try DictionaryDatabase(path: url.path)
