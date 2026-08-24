@@ -17,7 +17,7 @@ Groups each story by the feature area it touches. Matches the Backlog section's 
 - **Dictionary** — dictionary lookup and the results screen
 - **General** — cross-cutting, not scoped to one feature area
 
-## v1 closure review (2026-08-23)
+## v1 release notes (2026-08-23)
 
 <details>
 <summary>Show version summary</summary>
@@ -35,7 +35,7 @@ The isolated-single-kanji, low-confidence, and no-dictionary-entry spot-checks w
 
 </details>
 
-## v2 closure review (2026-08-24)
+## v2 release notes (2026-08-24)
 
 <details>
 <summary>Show version summary</summary>
