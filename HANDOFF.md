@@ -4,7 +4,7 @@ Written at the end of a long session (2026-08-24, following on from 2026-08-22/2
 
 ## Current state
 
-v1 and v2 are both functionally complete and closed — see STORIES.md's "v1 closure review" and "v2 closure review" sections for what each covers (v2's is effectively release notes). App builds, runs on a physical iPhone, and the scan → select → results flow now covers kanji, katakana, Arabic-numeral+counter compounds, and per-character furigana, on top of v1's original kanji-only scope. Last commit: `e96d6da`. Repo: [github.com/asa-augustin-17/kanji-ocr-app](https://github.com/asa-augustin-17/kanji-ocr-app), single `main` branch, no PR workflow — we commit and push directly.
+v1 and v2 are both functionally complete and closed — see STORIES.md's "v1 release notes" and "v2 release notes" sections for what each covers. App builds, runs on a physical iPhone, and the scan → select → results flow now covers kanji, katakana, Arabic-numeral+counter compounds, and per-character furigana, on top of v1's original kanji-only scope. Last commit: `e96d6da`. Repo: [github.com/asa-augustin-17/kanji-ocr-app](https://github.com/asa-augustin-17/kanji-ocr-app), single `main` branch, no PR workflow — we commit and push directly.
 
 The bundled dictionary (`kanji_scanner.sqlite`) grew from ~53MB to ~92MB this session (furigana data, katakana import, a new index) and is now tracked via **Git LFS** (`brew install git-lfs && git lfs install`, `.gitattributes` tracks `*.sqlite`) — a clone without git-lfs checks out a small pointer file instead of the real database and the app won't build. See README.md.
 
