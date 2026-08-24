@@ -124,4 +124,34 @@ final class SegmenterTests: XCTestCase {
 
         XCTAssertEqual(tokens[0].result.word?.surfaceForm, "コーヒー")
     }
+
+    func testStandaloneKatakanaMiddleDotProducesNoToken() {
+        // BUG-012: a lone ・ (e.g. from OCR misreading a printed period)
+        // shouldn't become its own tappable "no dictionary entry found"
+        // region - it's punctuation, not a word.
+        let tokens = Segmenter.segment("・", using: database)
+
+        XCTAssertTrue(tokens.isEmpty)
+    }
+
+    func testStandaloneLongVowelMarkProducesNoToken() {
+        // Same as the middle-dot case, for the other katakana connector: ー
+        // alone isn't a word either.
+        let tokens = Segmenter.segment("ー", using: database)
+
+        XCTAssertTrue(tokens.isEmpty)
+    }
+
+    func testKatakanaMiddleDotBetweenTwoWordsIsSkippedNotTapped() {
+        // "コーヒー・パソコン" - a real-world-shaped separator use (like a
+        // menu listing コーヒー・紅茶). Both words should still be found;
+        // the ・ between them should be silently skipped, not produce its
+        // own dead-end token (BUG-012), and shouldn't get swallowed into
+        // either neighboring word's token either.
+        let tokens = Segmenter.segment("コーヒー・パソコン", using: database)
+
+        XCTAssertEqual(tokens.count, 2)
+        XCTAssertEqual(tokens[0].result.word?.surfaceForm, "コーヒー")
+        XCTAssertEqual(tokens[1].result.word?.surfaceForm, "パソコン")
+    }
 }

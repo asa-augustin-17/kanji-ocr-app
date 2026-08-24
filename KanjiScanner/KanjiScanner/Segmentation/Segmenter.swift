@@ -26,6 +26,18 @@ enum JapaneseText {
         }
         return (0x30A0...0x30FF).contains(scalar.value)
     }
+
+    /// True for the two katakana-block characters that are punctuation/
+    /// connectors rather than sound-bearing mora: U+30FB (・, the
+    /// word-separator middle dot, e.g. コカ・コーラ) and U+30FC (ー, the
+    /// long vowel mark, e.g. コーヒー). Both are legitimate *inside* a real
+    /// katakana word, but meaningless standing alone as a "word" — OCR
+    /// occasionally misreads a printed period as ・, which would otherwise
+    /// become its own tappable "no dictionary entry found" region now that
+    /// katakana runs are matched at all (US-23; see BUG-012).
+    static func isKatakanaConnector(_ character: Character) -> Bool {
+        character == "\u{30FB}" || character == "\u{30FC}"
+    }
 }
 
 struct SegmentToken {
@@ -71,7 +83,12 @@ enum Segmenter {
                 }
 
                 let run = unmatchedKatakanaRun(in: text, from: index, database: database)
-                tokens.append(run)
+                // BUG-012: a run made up entirely of ・/ー (no actual
+                // katakana letters) isn't a word - skip it like any other
+                // non-katakana punctuation, rather than making it tappable.
+                if !run.result.token.allSatisfy(JapaneseText.isKatakanaConnector) {
+                    tokens.append(run)
+                }
                 index = run.range.upperBound
                 continue
             }
@@ -179,6 +196,9 @@ enum Segmenter {
     /// kanji, there's no per-character breakdown to fall back to here —
     /// individual katakana characters aren't dictionary entries the way
     /// individual kanji are — so this always resolves to `hasEntry == false`.
+    /// The caller (BUG-012) discards the result instead of appending it when
+    /// the whole run turns out to be nothing but ・/ー connectors — this
+    /// function itself doesn't know that policy, it just reports the range.
     ///
     /// Same early-stop behavior as `unmatchedKanjiRun`: the run stops as soon
     /// as a match would start at a later position, so a genuine word partway

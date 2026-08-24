@@ -102,6 +102,7 @@ enum TestDictionaryFactory {
             // own — exercises the US-23 reading-fallback path (real-world
             // equivalent: 珈琲/コーヒー).
             try insertWord("煙草", reading: "タバコ", meanings: ["tobacco", "cigarette"], kanjiIDs: [])
+            try insertWord("パソコン", reading: "パソコン", meanings: ["personal computer", "PC"], kanjiIDs: [])
         }
 
         return try DictionaryDatabase(path: url.path)
