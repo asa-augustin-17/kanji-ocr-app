@@ -342,6 +342,31 @@ As a learner, I want the reading of a compound word shown as furigana directly a
 
 </details>
 
+<details id="us-19">
+<summary><strong>US-19 — Treat a single detected character as a vocab term, not just a kanji.</strong></summary>
+
+As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.
+- Today, per FR-15/[US-3](#us-3), a single-kanji selection always shows the isolated-kanji detail view (`KanjiDetailView`) — it never checks whether that single character is *also* a `words` table entry in its own right.
+- New behavior: default to showing the word entry (if the single character matches one) at the top, with its one-kanji breakdown below — mirroring the exact layout `WordSection` + `KanjiBreakdownSection` already use for 2+ kanji compounds.
+- Implemented entirely in `Segmenter.swift`'s `unmatchedKanjiRun` — no `ResultsView` change needed at all, since its existing branching already renders `WordSection` + `KanjiBreakdownSection` for *any* `word != nil` result regardless of breakdown length; it just never had a chance to see `word != nil` for a length-1 result before. `longestCompoundMatch` itself is untouched (still requires length ≥ 2) — a length-1 word lookup only happens once an unmatched run resolves down to exactly one character, so a longer unmatched run with an embedded standalone-word kanji (e.g. the existing "本犬" test) still stays grouped as one fallback token, unaffected.
+- Verified against the real bundled dictionary: 目 (め, "eye") — both a kanji and a common standalone word — now renders as a word entry (furigana + full sense list) instead of the plain kanji detail view. New regression-guarded unit test (`犬`, seeded as a kanji only, continues to fall back to kanji-only display) confirms kanji *without* a matching word entry are unaffected.
+- *Closed* by the user on-device. One related edge case surfaced during testing — an OCR'd conjugated word (e.g. 飼ってる) not resolving to its dictionary (plain) form — tracked separately as **[US-30](#us-30)**, since it's a distinct problem (deconjugation) rather than anything wrong with this story's single-character matching.
+
+</details>
+
+<details id="us-23">
+<summary><strong>US-23 — Expand vocab matching to katakana words.</strong></summary>
+
+As a learner, I want katakana words (loanwords, onomatopoeia, etc.) to be recognized and looked up too, not just kanji and kanji compounds, so that I don't hit a dead end scanning text that's partly or fully katakana. If a katakana word I scan also has a kanji form in the dictionary (e.g. コーヒー/珈琲), I want it to resolve to that same, richer kanji entry — reading and kanji breakdown included — rather than treating the katakana spelling as a dead end just because it isn't the "primary" written form.
+- Current segmentation (`Segmenter.swift`) and dictionary import (`build_dictionary.py`'s kanji-only filter) are deliberately scoped to kanji/kanji-compounds only, per the PRD's v1 non-goals — this is an explicit expansion beyond that original scope.
+- **AC1 (katakana-only words):** `build_dictionary.py` now also imports JMdict's kana-only entries (previously skipped entirely) whose reading is pure katakana — loanwords/onomatopoeia — using the reading itself as `surface_form` since there's no separate kanji writing; hiragana-only entries remain out of scope. Added 37,686 words (231k → 269k), coverage confirmed against real loanwords (パソコン, タクシー, ホテル, パン).
+- **AC2 (kanji-fallback for katakana spellings of kanji words):** a katakana word with no katakana-only entry of its own, but whose reading matches a distinct kanji-form entry (e.g. コーヒー is only in JMdict as 珈琲's reading, not as its own kana-only entry), resolves to that kanji entry — same full breakdown a learner would get by scanning 珈琲 directly. New `DictionaryDatabase.wordEntry(reading:)` (indexed via `idx_words_reading`) restricted to `surface_form != reading` so it only ever surfaces genuine kanji entries, not duplicate katakana-only ones. `Segmenter`'s new `longestKatakanaMatch` tries an exact surface-form match first, then this reading fallback, at each candidate length.
+- **AC3 (segmentation):** `Segmenter.swift` gained `JapaneseText.isKatakana` and matches katakana runs with the same longest-match-first strategy already used for kanji. An unmatched katakana run still becomes one tappable "no dictionary entry found" region ([US-6](#us-6)), mirroring `unmatchedKanjiRun`, but without a per-character breakdown (individual katakana characters aren't dictionary entries).
+- **AC4 (display):** `ResultsView.swift`'s `WordSection` skips furigana entirely when a word's surface form already equals its reading (true for every katakana-only entry, not for kanji-fallback matches like 珈琲) — showing the identical string as ruby text above itself would be redundant, and real printed Japanese never glosses katakana this way.
+- *Closed.* User-confirmed working.
+
+</details>
+
 <details id="us-25">
 <summary><strong>US-25 — Per-character furigana for compound words (supersedes <a href="#us-18">US-18</a>).</strong></summary>
 
@@ -363,18 +388,6 @@ As a learner, after getting true per-character furigana ([US-25](#us-25)), I wan
 
 </details>
 
-<details id="us-19">
-<summary><strong>US-19 — Treat a single detected character as a vocab term, not just a kanji.</strong></summary>
-
-As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.
-- Today, per FR-15/[US-3](#us-3), a single-kanji selection always shows the isolated-kanji detail view (`KanjiDetailView`) — it never checks whether that single character is *also* a `words` table entry in its own right.
-- New behavior: default to showing the word entry (if the single character matches one) at the top, with its one-kanji breakdown below — mirroring the exact layout `WordSection` + `KanjiBreakdownSection` already use for 2+ kanji compounds.
-- Implemented entirely in `Segmenter.swift`'s `unmatchedKanjiRun` — no `ResultsView` change needed at all, since its existing branching already renders `WordSection` + `KanjiBreakdownSection` for *any* `word != nil` result regardless of breakdown length; it just never had a chance to see `word != nil` for a length-1 result before. `longestCompoundMatch` itself is untouched (still requires length ≥ 2) — a length-1 word lookup only happens once an unmatched run resolves down to exactly one character, so a longer unmatched run with an embedded standalone-word kanji (e.g. the existing "本犬" test) still stays grouped as one fallback token, unaffected.
-- Verified against the real bundled dictionary: 目 (め, "eye") — both a kanji and a common standalone word — now renders as a word entry (furigana + full sense list) instead of the plain kanji detail view. New regression-guarded unit test (`犬`, seeded as a kanji only, continues to fall back to kanji-only display) confirms kanji *without* a matching word entry are unaffected.
-- *Closed* by the user on-device. One related edge case surfaced during testing — an OCR'd conjugated word (e.g. 飼ってる) not resolving to its dictionary (plain) form — tracked separately as **[US-30](#us-30)**, since it's a distinct problem (deconjugation) rather than anything wrong with this story's single-character matching.
-
-</details>
-
 <details id="us-31">
 <summary><strong>US-31 — Recognize Arabic-numeral + counter (josūshi) compounds.</strong></summary>
 
@@ -389,19 +402,6 @@ As a learner, when OCR captures a printed count like "1匹" (one small animal), 
 
 **Implemented** exactly per the plan above: `JapaneseText.isDigit` (ASCII only), `smallKanjiNumeral(_:)` (0-10, including `〇`), and `numeralCounterMatch` (tries counter lengths 2 then 1, range over the original text, content from the matched kanji-numeral entry) — wired into `segment()` as a third branch alongside kanji/katakana, with no fallback token for an unmatched digit run. 6 new `SegmenterTests` cases, all passing (24/24 total). Verified against the real bundled dictionary via the Simulator debug harness: `1匹` within `犬が1匹いる` correctly resolves to `一匹`'s real entry (いっぴき, "one (small animal)", full furigana, kanji breakdown for both 一 and 匹).
 - *Closed* by the user on-device.
-
-</details>
-
-<details id="us-23">
-<summary><strong>US-23 — Expand vocab matching to katakana words.</strong></summary>
-
-As a learner, I want katakana words (loanwords, onomatopoeia, etc.) to be recognized and looked up too, not just kanji and kanji compounds, so that I don't hit a dead end scanning text that's partly or fully katakana. If a katakana word I scan also has a kanji form in the dictionary (e.g. コーヒー/珈琲), I want it to resolve to that same, richer kanji entry — reading and kanji breakdown included — rather than treating the katakana spelling as a dead end just because it isn't the "primary" written form.
-- Current segmentation (`Segmenter.swift`) and dictionary import (`build_dictionary.py`'s kanji-only filter) are deliberately scoped to kanji/kanji-compounds only, per the PRD's v1 non-goals — this is an explicit expansion beyond that original scope.
-- **AC1 (katakana-only words):** `build_dictionary.py` now also imports JMdict's kana-only entries (previously skipped entirely) whose reading is pure katakana — loanwords/onomatopoeia — using the reading itself as `surface_form` since there's no separate kanji writing; hiragana-only entries remain out of scope. Added 37,686 words (231k → 269k), coverage confirmed against real loanwords (パソコン, タクシー, ホテル, パン).
-- **AC2 (kanji-fallback for katakana spellings of kanji words):** a katakana word with no katakana-only entry of its own, but whose reading matches a distinct kanji-form entry (e.g. コーヒー is only in JMdict as 珈琲's reading, not as its own kana-only entry), resolves to that kanji entry — same full breakdown a learner would get by scanning 珈琲 directly. New `DictionaryDatabase.wordEntry(reading:)` (indexed via `idx_words_reading`) restricted to `surface_form != reading` so it only ever surfaces genuine kanji entries, not duplicate katakana-only ones. `Segmenter`'s new `longestKatakanaMatch` tries an exact surface-form match first, then this reading fallback, at each candidate length.
-- **AC3 (segmentation):** `Segmenter.swift` gained `JapaneseText.isKatakana` and matches katakana runs with the same longest-match-first strategy already used for kanji. An unmatched katakana run still becomes one tappable "no dictionary entry found" region ([US-6](#us-6)), mirroring `unmatchedKanjiRun`, but without a per-character breakdown (individual katakana characters aren't dictionary entries).
-- **AC4 (display):** `ResultsView.swift`'s `WordSection` skips furigana entirely when a word's surface form already equals its reading (true for every katakana-only entry, not for kanji-fallback matches like 珈琲) — showing the identical string as ruby text above itself would be redundant, and real printed Japanese never glosses katakana this way.
-- *Closed.* User-confirmed working.
 
 </details>
 
