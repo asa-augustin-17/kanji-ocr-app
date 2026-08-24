@@ -34,10 +34,10 @@ Per-story detail and status updates are below.
 |----|---|---|---|---|---|
 | US-1 | Capture a photo of printed Japanese text | Camera | Closed | 2026-08-22 | v1 |
 | US-2 | Select the specific text region to look up | Captured Picture | Closed | 2026-08-23 | v1 |
-| US-3 | View dictionary results for an isolated kanji | Dictionary | Implemented | — | v1 |
+| US-3 | View dictionary results for an isolated kanji | Dictionary | Closed | 2026-08-23 | v1 |
 | US-4 | View dictionary results for a kanji compound/word | Dictionary | Closed | 2026-08-23 | v1 |
-| US-5 | Use the app with no network connection | General | Implemented | — | v1 |
-| US-6 | Handle unrecognized or low-confidence scans gracefully | General | Implemented | — | v1 |
+| US-5 | Use the app with no network connection | General | Closed | 2026-08-23 | v1 |
+| US-6 | Handle unrecognized or low-confidence scans gracefully | General | Closed | 2026-08-23 | v1 |
 | US-7 | Retain the option to re-scan quickly | Camera | Closed | 2026-08-22 | v1 |
 
 **US-1 — Capture a photo of printed Japanese text.** As a learner, I want to open the app and immediately point my camera at text, so that I can capture kanji with minimal steps.
@@ -56,7 +56,7 @@ Per-story detail and status updates are below.
 - Results show the character, on'yomi (katakana), kun'yomi (hiragana), and English meaning(s).
 - Multiple meanings all shown.
 - Results render within 2 seconds, fully offline.
-- *Implemented (`KanjiDetailView`), and its layout building blocks (character/readings/meanings rendering) are the same ones proven working in every compound-breakdown screenshot — but the specific top-level "tapped a standalone kanji that isn't part of any recognized compound" screen hasn't actually been seen on-device yet; every screenshot so far has been a multi-kanji compound. Worth one explicit spot-check on an isolated kanji.*
+- *Closed.* `KanjiDetailView`'s layout building blocks (character/readings/meanings rendering) were already proven working in every compound-breakdown screenshot; the specific top-level isolated-kanji screen — previously unobserved, every earlier screenshot having been a multi-kanji compound — has now been explicitly spot-checked and user-confirmed on-device.
 
 **US-4 — View dictionary results for a kanji compound/word.** As a learner, I want to see the compound word's reading and meaning first, with each constituent kanji broken out below it, so that I understand both the word as a whole and its building blocks (Yomitan-style).
 - Compound word, reading, and meaning(s) shown at the top.
@@ -66,12 +66,12 @@ Per-story detail and status updates are below.
 
 **US-5 — Use the app with no network connection.** As a learner, I want the app to work exactly the same on a subway with no signal or in airplane mode as it does with full connectivity, so that I never lose functionality when I need it most.
 - OCR, segmentation, and dictionary lookup all run fully on-device; no network code exists in the app.
-- *Structurally guaranteed (there is no networking code anywhere in the app to fail), but never explicitly exercised with an actual airplane-mode test on-device. Worth a quick explicit check before calling v1 fully done, even though it's very low-risk.*
+- *Closed.* Structurally guaranteed (there is no networking code anywhere in the app to fail), and now also explicitly exercised with an actual airplane-mode test on-device — user-confirmed.
 
 **US-6 — Handle unrecognized or low-confidence scans gracefully.** As a learner, I want clear feedback when the app can't confidently identify text, so that I know to retake the photo rather than getting a wrong answer.
 - Below-threshold OCR confidence shows "couldn't confidently read this — try retaking the photo" instead of a guessed result.
 - Recognized-but-not-in-dictionary text clearly states "no dictionary entry found."
-- *Implemented (`lowConfidenceState` in `ScanOverlayView`, `NoMatchView` in results), but neither state has been explicitly seen on-device yet — no screenshot so far has shown either. Note: a photo with text that OCR reads confidently but contains zero kanji (pure kana/romaji) currently also lands on the "couldn't confidently read this" message, since no tappable regions get built for it — the wording is a bit of a mismatch for that specific case (it wasn't a confidence problem), though the suggested action (retake) is still reasonable. Not a blocker, just a minor phrasing note.*
+- *Closed.* Both states (`lowConfidenceState` in `ScanOverlayView`, `NoMatchView` in results) have now been explicitly seen and user-confirmed on-device. Note: a photo with text that OCR reads confidently but contains zero kanji (pure kana/romaji) currently also lands on the "couldn't confidently read this" message, since no tappable regions get built for it — the wording is a bit of a mismatch for that specific case (it wasn't a confidence problem), though the suggested action (retake) is still reasonable. Not a blocker, just a minor phrasing note.*
 
 **US-7 — Retain the option to re-scan quickly.** As a learner, I want to return to the camera quickly after viewing a result, so that I can look up the next unfamiliar kanji without extra taps.
 - A single, obvious "Scan Again" action returns to the live camera view.
