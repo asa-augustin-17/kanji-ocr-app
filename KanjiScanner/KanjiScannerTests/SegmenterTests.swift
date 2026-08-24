@@ -26,6 +26,18 @@ final class SegmenterTests: XCTestCase {
         XCTAssertEqual(tokens[0].result.kanjiBreakdown.map(\.character), ["犬"])
     }
 
+    func testIsolatedSingleKanjiPrefersWordEntryWhenOneExists() {
+        // US-19: 目 is both a kanji and a standalone word in its own right -
+        // an isolated single-kanji selection should surface the word (with
+        // its one-kanji breakdown), not just the plain kanji detail view.
+        let tokens = Segmenter.segment("目", using: database)
+
+        XCTAssertEqual(tokens.count, 1)
+        XCTAssertEqual(tokens[0].result.word?.surfaceForm, "目")
+        XCTAssertEqual(tokens[0].result.word?.meanings, ["eye"])
+        XCTAssertEqual(tokens[0].result.kanjiBreakdown.map(\.character), ["目"])
+    }
+
     func testSkipsNonKanjiCharacters() {
         // は and です are kana and should produce no tokens; only 漢字 should.
         let tokens = Segmenter.segment("は漢字です", using: database)

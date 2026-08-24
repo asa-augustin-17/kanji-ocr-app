@@ -166,6 +166,16 @@ enum Segmenter {
     /// later kanji, so a genuine compound partway through an otherwise
     /// non-dictionary run (e.g. "犬日本" where "日本" matches) is still
     /// found correctly on the next iteration of the outer loop.
+    ///
+    /// When the run turns out to be exactly one character (US-19), that
+    /// character might *also* be a standalone word in its own right — many
+    /// common kanji are (目/め "eye", 手/て "hand") — which
+    /// `longestCompoundMatch` above never checks, since it only ever tries
+    /// candidates of length 2 or more. This is the one place a length-1
+    /// word lookup belongs: only for a truly isolated kanji, not for any
+    /// individual kanji inside a longer unmatched run (those stay grouped
+    /// together as a single fallback token, per US-4's acceptance
+    /// criterion — this doesn't change that).
     private static func unmatchedKanjiRun(
         in text: String,
         from start: String.Index,
@@ -185,7 +195,8 @@ enum Segmenter {
         }
 
         let token = String(text[start..<end])
-        let result = LookupResult(token: token, word: nil, kanjiBreakdown: entries)
+        let word = token.count == 1 ? database.wordEntry(surfaceForm: token) : nil
+        let result = LookupResult(token: token, word: word, kanjiBreakdown: entries)
         return SegmentToken(range: start..<end, result: result)
     }
 

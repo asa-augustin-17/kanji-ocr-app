@@ -82,7 +82,6 @@ Per-story detail and status updates are below.
 
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
-| US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | — | v1 |
 | US-10 | Resume the same zoom/pan level when backing out of a result | Captured Picture | Closed | 2026-08-23 | 2026-08-23 | v1 |
 | US-9 | Pinch-to-zoom on the captured photo | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
 | US-8 | Return to the captured photo to select a different region | Captured Picture | Closed | 2026-08-22 | 2026-08-23 | v1 |
@@ -105,11 +104,6 @@ Per-story detail and status updates are below.
 - No user-facing setting for this yet — it's the only behavior; making it optional is tracked separately as US-11.
 - *Implemented by lifting the zoom/pan state out of `ScanOverlayView` into `RootView`, so it survives the view being recreated on Back navigation, instead of resetting to defaults each time. User-confirmed on-device.*
 
-**US-11 — Setting to toggle resume-zoom-on-back behavior on/off.** As a learner, I want to be able to turn off the "resume zoom on back" behavior (US-10) if I don't like it, so that I can get the old always-reset-to-1x behavior back instead.
-- Explicitly out of scope for the initial US-10 implementation — logged separately since it's a distinct piece of work (a settings surface, a persisted preference, and branching behavior based on it) rather than part of the core feature.
-- The app currently has no settings/preferences screen at all (PRD explicitly excludes one from v1 — see PRD §4.7/§6), so this would also be the first thing to require one.
-- *Not started.*
-
 ## Backlog (post-v1)
 
 Requested by the user on 2026-08-23 but explicitly scoped as future work, not part of v1 — logged for planning purposes only. Most of these remain unscheduled (`Backlog`), though a few (US-18, US-25, US-26) have since been completed and assigned to `v2`.
@@ -126,7 +120,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | US-22 | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | — | Backlog |
 | US-21 | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | — | Backlog |
 | US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — | Backlog |
-| US-19 | Treat a single detected character as a vocab term, not just a kanji | Dictionary | Not Started | 2026-08-23 | — | Backlog |
+| US-19 | Treat a single detected character as a vocab term, not just a kanji | Dictionary | Implemented | 2026-08-23 | — | Backlog |
 | US-18 | Display vocab furigana above the characters, not below | Dictionary | Closed | 2026-08-23 | 2026-08-23 | v2 |
 | US-17 | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | — | Backlog |
 | US-16 | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | — | Backlog |
@@ -134,6 +128,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | US-14 | Fix the scan-overlay zoom-out "kink" (see BUG-010) | Captured Picture | Not Started | 2026-08-23 | — | Backlog |
 | US-13 | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | — | Backlog |
 | US-12 | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | — | Backlog |
+| US-11 | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | — | Backlog |
 
 ### Camera
 
@@ -145,6 +140,11 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - *Not started.*
 
 ### Captured Picture
+
+**US-11 — Setting to toggle resume-zoom-on-back behavior on/off.** As a learner, I want to be able to turn off the "resume zoom on back" behavior (US-10) if I don't like it, so that I can get the old always-reset-to-1x behavior back instead.
+- Explicitly out of scope for the initial US-10 implementation — logged separately since it's a distinct piece of work (a settings surface, a persisted preference, and branching behavior based on it) rather than part of the core feature.
+- The app currently has no settings/preferences screen at all (PRD explicitly excludes one from v1 — see PRD §4.7/§6), so this would also be the first thing to require one.
+- *Not started.*
 
 **US-14 — Fix the scan-overlay zoom-out "kink" (see BUG-010).** As a learner, I want zooming out on the captured photo to feel like one smooth motion, so that the interaction feels polished rather than glitchy.
 - Same underlying issue as [BUG-010](BUGS.md) (deferred after multiple failed fix attempts) — logged here as a story too per the user's request, since it's a piece of desired product behavior, not just a defect to patch.
@@ -208,7 +208,9 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 **US-19 — Treat a single detected character as a vocab term, not just a kanji.** As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.
 - Today, per FR-15/US-3, a single-kanji selection always shows the isolated-kanji detail view (`KanjiDetailView`) — it never checks whether that single character is *also* a `words` table entry in its own right.
 - New behavior: default to showing the word entry (if the single character matches one) at the top, with its one-kanji breakdown below — mirroring the exact layout `WordSection` + `KanjiBreakdownSection` already use for 2+ kanji compounds.
-- *Not started.*
+- Implemented entirely in `Segmenter.swift`'s `unmatchedKanjiRun` — no `ResultsView` change needed at all, since its existing branching already renders `WordSection` + `KanjiBreakdownSection` for *any* `word != nil` result regardless of breakdown length; it just never had a chance to see `word != nil` for a length-1 result before. `longestCompoundMatch` itself is untouched (still requires length ≥ 2) — a length-1 word lookup only happens once an unmatched run resolves down to exactly one character, so a longer unmatched run with an embedded standalone-word kanji (e.g. the existing "本犬" test) still stays grouped as one fallback token, unaffected.
+- Verified against the real bundled dictionary: 目 (め, "eye") — both a kanji and a common standalone word — now renders as a word entry (furigana + full sense list) instead of the plain kanji detail view. New regression-guarded unit test (`犬`, seeded as a kanji only, continues to fall back to kanji-only display) confirms kanji *without* a matching word entry are unaffected.
+- *Implemented* — not yet confirmed on-device by the user.
 
 **US-20 — Show vocab tags (part of speech, common, JLPT, WaniKani) in results.** As a learner, I want to see a word's part of speech, whether it's a common word, and (once available) its JLPT/WaniKani level directly on the results screen, so that I get more context about the word without leaving the app.
 - `part_of_speech` and `is_common` already exist in the `words` schema (populated from JMdict) but per FR-13 are deliberately not surfaced in the v1 UI — this story is exactly the "later version" FR-13 anticipated.

@@ -84,6 +84,7 @@ enum TestDictionaryFactory {
             let hon = try insertKanji("本", onyomi: ["ホン"], kunyomi: ["もと"], meanings: ["book", "origin"])
             let go = try insertKanji("語", onyomi: ["ゴ"], kunyomi: ["かた.る"], meanings: ["word", "language"])
             _ = try insertKanji("犬", onyomi: [], kunyomi: ["いぬ"], meanings: ["dog"])
+            let me = try insertKanji("目", onyomi: ["モク", "ボク"], kunyomi: ["め"], meanings: ["eye", "class"])
 
             try insertWord(
                 "漢字",
@@ -103,6 +104,10 @@ enum TestDictionaryFactory {
             // equivalent: 珈琲/コーヒー).
             try insertWord("煙草", reading: "タバコ", meanings: ["tobacco", "cigarette"], kanjiIDs: [])
             try insertWord("パソコン", reading: "パソコン", meanings: ["personal computer", "PC"], kanjiIDs: [])
+            // Single kanji that's also a standalone word (US-19) - 犬
+            // deliberately has no such entry, so it stays the regression
+            // guard for "isolated kanji with no word match".
+            try insertWord("目", reading: "め", meanings: ["eye"], kanjiIDs: [me])
         }
 
         return try DictionaryDatabase(path: url.path)
