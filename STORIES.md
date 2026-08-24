@@ -20,7 +20,7 @@ Groups each story by the feature area it touches. Matches the Backlog section's 
 ## v1 closure review (2026-08-23)
 
 <details>
-<summary>Show details</summary>
+<summary>Show version summary</summary>
 
 **What v1 shipped, in short:** a fully offline kanji/compound scanner. Point the camera at printed Japanese and capture — every detected kanji or kanji-compound gets its own tappable bounding box drawn over the photo (pinch-zoomable/pannable for small or tightly-packed text, resuming the same zoom/pan on "Back"). Tapping a region shows the compound's reading/meaning with each constituent kanji broken out below, a "no compound match" indicator plus the same per-kanji breakdown if the compound isn't in the dictionary, a standalone kanji's on'yomi/kun'yomi/meanings, or a graceful "no dictionary entry found" message. "Back" returns to the same captured photo to pick a different region; "Scan Again" starts fresh. Everything runs on-device — no network code exists in the app at all. Katakana, hiragana, and Arabic-numeral text were explicitly out of scope (v2 added those).
 
@@ -38,7 +38,7 @@ The isolated-single-kanji, low-confidence, and no-dictionary-entry spot-checks w
 ## v2 closure review (2026-08-24)
 
 <details>
-<summary>Show details</summary>
+<summary>Show version summary</summary>
 
 v2 covers everything closed after v1, all landed in a single long session. Effectively release notes — grouped by what a user would notice, not by story ID.
 
