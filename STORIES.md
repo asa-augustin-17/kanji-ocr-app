@@ -110,6 +110,8 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
+| US-34 | Don't auto-select when only one region is detected | Captured Picture | Not Started | 2026-08-24 | — | Backlog |
+| US-33 | Exclude unmatched single characters from getting a bounding box | Captured Picture | Not Started | 2026-08-24 | — | Backlog |
 | US-32 | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | — | Backlog |
 | US-31 | Recognize Arabic-numeral + counter (josūshi) compounds | Dictionary | Closed | 2026-08-24 | 2026-08-24 | v2 |
 | US-30 | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | — | Backlog |
@@ -156,6 +158,21 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 **US-15 — Smooth, decaying scroll deceleration on the captured photo.** As a learner, I want panning around the zoomed-in photo to slow down gradually after I lift my finger (like the Photos app), instead of stopping dead the instant I release, so that panning around a large zoomed-in image feels natural rather than abrupt.
 - Currently panning has no momentum at all — motion stops exactly when the touch ends.
 - Distinct from US-14/BUG-010: this is about adding inertia/momentum to panning, not about the zoom-out kink.
+- *Not started.*
+
+**US-33 — Exclude unmatched single characters from getting a bounding box.** As a learner, when a lone, isolated character is recognized by OCR but has no dictionary entry at all, I don't want it to get a tappable bounding box — tapping it only leads to a "No dictionary entry found" screen with nothing useful on it. Example: ト (katakana) gets a box today, but tapping it just shows the no-entry screen.
+- **This reverses an explicit v1 acceptance criterion, not a plain bug fix — flagging that clearly.** US-6's original AC states: "Recognized-but-not-in-dictionary text clearly states 'no dictionary entry found.'" That was a deliberate v1 design choice (graceful, informative failure over silently dropping the region), tested via `testUnknownKanjiProducesNoEntryResult`. This story asks to narrow it: for a *single, isolated* unmatched character specifically, don't surface it at all, rather than surfacing it with an unhelpful dead end.
+- **Scope question, not yet settled — the story's own example is katakana, but its stated principle ("a kanji character") is broader:**
+  - For **kanji**: a single kanji with no `kanji`-table entry at all is rare (KANJIDIC2 is comprehensive — 13,000+ characters), but when it happens the character itself is still real, named information (its existence was worth confirming, even without full details) — arguably still worth a "recognized, but no entry" indicator per US-6's original reasoning.
+  - For **katakana**: a single unmatched katakana character is architecturally different and much more common — a lone kana mora (ト, カ, ラ...) essentially never stands alone as meaningful vocabulary the way a single kanji often does (that distinction is exactly what made **US-19** valuable for kanji). A lone unmatched katakana character is far more likely to be an OCR fragment of a longer word, or noise (the same category BUG-012 already started addressing for punctuation marks specifically).
+  - Recommend scoping this to **katakana only** initially (lower risk, doesn't touch v1's tested kanji behavior), leaving single-unmatched-kanji as-is unless revisited deliberately.
+- **Not** about multi-character unmatched runs (`unmatchedKanjiRun`/`unmatchedKatakanaRun` grouping several characters together) — those stay exactly as they are; this is specifically the single-character case, where `token.count == 1` and the result resolves to `hasEntry == false`.
+- Code: `Segmenter.swift`'s `unmatchedKanjiRun`/`unmatchedKatakanaRun` (`Segmenter.swift:280`/`:319`) — for a single-character result with no match, don't append the token at all instead of returning it as a no-entry region, mirroring the "no fallback token" policy already used for unmatched digits (US-31) and hiragana (US-32's plan).
+- *Not started.*
+
+**US-34 — Don't auto-select when only one region is detected.** As a learner, when a scan detects only one region, I want the captured photo to render normally — showing that one bounding box, waiting for me to tap it — the same as when multiple regions are detected, instead of jumping straight to the results screen without me tapping anything.
+- **This also reverses an explicit v1 acceptance criterion.** US-2's original AC states: "Tapping a region selects it for lookup; a single detected region auto-selects." That auto-select behavior is exactly what's now being asked to remove, based on actually trying it on-device — this was flagged in STORIES.md's own "v1 closure review" as a state that had *never been explicitly observed on-device* despite the code looking correct; now that it has been, the user's assessment is that it's the wrong behavior in practice (it removes the chance to double-check the detected region, and breaks the consistent "photo → tap → results" flow the multi-region case always has).
+- Code: `ScanOverlayView.swift:86` — `.onAppear { ... if regions.count == 1, let only = regions.first { onSelect(only.result) } }`. Removing this block (letting a single-region scan render exactly like a multi-region one, requiring an explicit tap) is the whole fix.
 - *Not started.*
 
 ### Databases
