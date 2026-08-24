@@ -121,7 +121,7 @@ private struct SegmentedFuriganaText: View {
                 VStack(spacing: 0) {
                     if let reading = segment.reading {
                         Text(reading)
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                     Text(segment.text)

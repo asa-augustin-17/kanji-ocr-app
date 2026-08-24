@@ -107,7 +107,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
-| US-26 | Tune per-character furigana sizing/legibility | Not Started | User request | 2026-08-23 | Backlog |
+| US-26 | Tune per-character furigana sizing/legibility | Verified | User request | 2026-08-23 | Backlog |
 | US-25 | Per-character furigana for compound words (supersedes US-18) | Closed | User request | 2026-08-23 | Backlog |
 | US-24 | Expand vocab matching to names of people and organizations | Not Started | User request | 2026-08-23 | Backlog |
 | US-23 | Expand vocab matching to katakana words | Not Started | User request | 2026-08-23 | Backlog |
@@ -168,8 +168,9 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - *Closed.* User-confirmed on-device ("This is a pass"). Follow-up sizing/legibility tuning (the reading font was bumped once already, `.caption2` → `.caption`, per user feedback that jukujikun readings looked too small) is tracked separately as **US-26** rather than continuing under this ID.
 
 **US-26 — Tune per-character furigana sizing/legibility.** As a learner, after getting true per-character furigana (US-25), I want its size/legibility kept tunable and refined further, so that readings stay comfortably legible across different words and screen sizes rather than settling permanently on whatever size shipped first.
-- Direct follow-up to US-25: the reading font was already bumped once this session (`Font.caption2` → `Font.caption` in `SegmentedFuriganaText`, `ResultsView.swift`) after the user found jukujikun readings (e.g. おとな over 大人) too small at the original size — this story tracks continuing that tuning.
-- *Not started.*
+- Direct follow-up to US-25: the reading font was bumped once (`Font.caption2` → `Font.caption`) after the user found jukujikun readings (e.g. おとな over 大人) too small, but that didn't fully close the gap — comparing 住居/すまい (which has no JmdictFurigana per-character data, so renders via `WholeWordFuriganaText`'s `.subheadline` font) against 住い/すまい (which does have per-character data, rendering via `SegmentedFuriganaText`, still at `.caption`) showed the two paths were visibly inconsistent in size.
+- Fixed by setting `SegmentedFuriganaText`'s reading font to `.subheadline`, matching `WholeWordFuriganaText` exactly — both furigana rendering paths now use the same size.
+- *Verified* by the user on-device.
 
 **US-19 — Treat a single detected character as a vocab term, not just a kanji.** As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.
 - Today, per FR-15/US-3, a single-kanji selection always shows the isolated-kanji detail view (`KanjiDetailView`) — it never checks whether that single character is *also* a `words` table entry in its own right.
