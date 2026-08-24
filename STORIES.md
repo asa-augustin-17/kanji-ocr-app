@@ -88,61 +88,125 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 ### Camera
 
 <a id="us-12"></a>**US-12 — Pinch-to-zoom the live camera before capturing.** As a learner, I want to zoom in on the live camera view before I tap capture, so that I can focus on small text (e.g. a single line on a crowded sign) without having to get physically closer or rely entirely on post-capture zoom.
+
+<details>
+<summary>Show details</summary>
+
 - Distinct from [US-9](#us-9) (zooming the *captured photo* after the fact) — this is zooming the *live viewfinder*, changing what's actually captured.
 - *Not started.*
 
+</details>
+
 <a id="us-13"></a>**US-13 — Tap to focus the camera before capturing.** As a learner, I want to tap on the live camera view to focus on a specific spot, so that blurry or off-focus text becomes sharp before I capture it, improving OCR accuracy.
+
+<details>
+<summary>Show details</summary>
+
 - *Not started.*
+
+</details>
 
 ### Captured Picture
 
 <a id="us-11"></a>**US-11 — Setting to toggle resume-zoom-on-back behavior on/off.** As a learner, I want to be able to turn off the "resume zoom on back" behavior ([US-10](#us-10)) if I don't like it, so that I can get the old always-reset-to-1x behavior back instead.
+
+<details>
+<summary>Show details</summary>
+
 - Explicitly out of scope for the initial [US-10](#us-10) implementation — logged separately since it's a distinct piece of work (a settings surface, a persisted preference, and branching behavior based on it) rather than part of the core feature.
 - The app currently has no settings/preferences screen at all (PRD explicitly excludes one from v1 — see PRD §4.7/§6), so this would also be the first thing to require one.
 - *Not started.*
 
+</details>
+
 <a id="us-14"></a>**US-14 — Fix the scan-overlay zoom-out "kink" (see [BUG-010](BUGS.md#bug-010)).** As a learner, I want zooming out on the captured photo to feel like one smooth motion, so that the interaction feels polished rather than glitchy.
+
+<details>
+<summary>Show details</summary>
+
 - Same underlying issue as [BUG-010](BUGS.md#bug-010) (deferred after multiple failed fix attempts) — logged here as a story too per the user's request, since it's a piece of desired product behavior, not just a defect to patch.
 - *Not started.*
 
+</details>
+
 <a id="us-15"></a>**US-15 — Smooth, decaying scroll deceleration on the captured photo.** As a learner, I want panning around the zoomed-in photo to slow down gradually after I lift my finger (like the Photos app), instead of stopping dead the instant I release, so that panning around a large zoomed-in image feels natural rather than abrupt.
+
+<details>
+<summary>Show details</summary>
+
 - Currently panning has no momentum at all — motion stops exactly when the touch ends.
 - Distinct from [US-14](#us-14)/[BUG-010](BUGS.md#bug-010): this is about adding inertia/momentum to panning, not about the zoom-out kink.
 - *Not started.*
 
+</details>
+
 <a id="us-34"></a>**US-34 — Don't auto-select when only one region is detected.** As a learner, when a scan detects only one region, I want the captured photo to render normally — showing that one bounding box, waiting for me to tap it — the same as when multiple regions are detected, instead of jumping straight to the results screen without me tapping anything.
+
+<details>
+<summary>Show details</summary>
+
 - **This also reverses an explicit v1 acceptance criterion.** [US-2](#us-2)'s original AC states: "Tapping a region selects it for lookup; a single detected region auto-selects." That auto-select behavior is exactly what's now being asked to remove, based on actually trying it on-device — this was flagged in STORIES.md's own "v1 closure review" as a state that had *never been explicitly observed on-device* despite the code looking correct; now that it has been, the user's assessment is that it's the wrong behavior in practice (it removes the chance to double-check the detected region, and breaks the consistent "photo → tap → results" flow the multi-region case always has).
 - Code: `ScanOverlayView.swift:86` — `.onAppear { ... if regions.count == 1, let only = regions.first { onSelect(only.result) } }`. Removing this block (letting a single-region scan render exactly like a multi-region one, requiring an explicit tap) is the whole fix.
 - *Not started.*
 
+</details>
+
 ### Databases
 
 <a id="us-16"></a>**US-16 — Add WaniKani level and Jōyō status to the kanji table.** As a learner, I want to (eventually) see a kanji's WaniKani level and whether it's a Jōyō (standard-use) kanji, so that I can gauge how commonly-taught/important a character is.
+
+<details>
+<summary>Show details</summary>
+
 - `is_joyo` may not need new source data: KANJIDIC2's existing `grade` field (already in the schema) encodes this — grades 1–8 are Jōyō kanji (taught in grades 1–6, plus remaining secondary-school Jōyō), grade 9/10 is Jinmeiyō (name-use only), and no grade means neither — so `is_joyo` could likely be derived from `grade` rather than sourced externally.
 - WaniKani level is *not* part of KANJIDIC2 and has no official public dataset from WaniKani itself — sourcing it would need either a community-maintained mapping or manual curation. Flagged by the user as "if this data is available" — needs research before implementation.
 - Per FR-13, the schema is already designed to accept fields like this without a breaking migration.
 - *Not started.*
 
+</details>
+
 <a id="us-17"></a>**US-17 — Add WaniKani level and JLPT level to the words table.** As a learner, I want to (eventually) see a vocab word's WaniKani level and JLPT level, so that I can gauge how commonly-taught the word is, the same way I could for individual kanji.
+
+<details>
+<summary>Show details</summary>
+
 - JMdict does not carry current JLPT-level tags for words (the old tagging was deprecated); a JLPT word list would need to come from a separate, community-maintained source. Same "if available" caveat as [US-16](#us-16) applies, doubly so here.
 - *Not started.*
+
+</details>
 
 ### Dictionary
 
 <a id="us-27"></a>**US-27 — Note when a word is usually written using kana alone.** As a learner, when a word technically has a kanji form but is conventionally written in kana in real usage (e.g. 綺麗/きれい), I want a note saying so — "Usually written using kana alone," the way Jisho.org shows it — so that I know not to expect the kanji form in everyday writing and don't over-index on memorizing it.
+
+<details>
+<summary>Show details</summary>
+
 - **Research: what the database needs.** JMdict's `<sense>` elements carry a `<misc>&uk;</misc>` tag (the entity expands to the literal string `"word usually written using kana alone"` — no lookup table needed, it's already the human-readable text) on exactly the senses this applies to. Confirmed against the real bundled source (`data-pipeline/sources/JMdict_e`): 9,584 entries carry this tag, and — usefully — *every single one* already has a kanji form (`k_ele`), meaning all 9,584 are already inside our current `words` import scope (verified by checking real 珈琲/コーヒー's entry directly, which itself carries the tag).
 - The tag is per-*sense*, not per-word, and a word can have senses that do and don't carry it — but `build_dictionary.py` already flattens all of a word's senses into one `meanings` array with no sense boundaries (a simplification [US-21](#us-21) already tracks revisiting), so the pragmatic match for the current schema is a single word-level boolean: true if *any* sense carries the tag. Needs one new column, `words.is_usually_kana INTEGER NOT NULL DEFAULT 0` (schema is regenerated fresh each build, so this is a `CREATE TABLE` change, not a live migration), set during `parse_jmdict` by checking `sense.findall('misc')` for that exact text.
 - Display: a small secondary-style note near the reading/meanings in `WordSection` (`ResultsView.swift`), shown only when the flag is set — this part needs no research, it's a straightforward conditional `Text`.
 - *Not started.*
 
+</details>
+
 <a id="us-28"></a>**US-28 — Show loanword etymology (source language/word).** As a learner, when a word is a loanword, I want to see where it came from — e.g. "From English 'coffee'," or multiple sources like 珈琲's "From English 'coffee'; from Dutch/Flemish 'koffie'" — the way Jisho.org shows it, so that I can use the etymology as a memory hook and understand why a word sounds the way it does.
+
+<details>
+<summary>Show details</summary>
+
 - **Research: what the database needs.** JMdict's `<sense>` elements carry `<lsource>` tags — confirmed on the real bundled source: 6,214 entries have at least one, but only 548 of those also have a kanji form under our current import scope; the rest are katakana-only loanwords, which **[US-23](#us-23)** (just shipped) now also imports — so this story is a natural, timely follow-up that benefits the bulk of the newly-added katakana vocabulary as well as the smaller set of kanji/ateji loanwords like 珈琲.
 - Unlike `uk`, `lsource` isn't a simple boolean — a single sense can carry *multiple* `lsource` tags (珈琲's own entry has two: `<lsource xml:lang="eng">coffee</lsource>` and `<lsource xml:lang="dut">koffie</lsource>`, matching the exact example from the PRD request), each with: an `xml:lang` attribute (ISO 639-2 code, defaults to `"eng"` per the JMdict DTD when the attribute is omitted — confirmed one bare `<lsource>text</lsource>` case exists in the source data), optional text content (the source word/phrase — sometimes absent, e.g. `<lsource xml:lang="kor"/>`, meaning the source language is known but no specific word was recorded), an optional `ls_type="part"` attribute (81 occurrences — this source only accounts for *part* of the word, for compounds blending multiple origins), and an optional `ls_wasei="y"` attribute (marks *wasei-eigo* — a Japanese-coined pseudo-loanword, not a genuine direct borrowing, e.g. "アメリカンコーヒー" ← `ls_wasei="y"` "American coffee").
 - This is a one-to-many relationship (a word can have several sources, in order), so unlike `is_usually_kana` it needs a proper child table, not a column: `word_lsources (word_id, language TEXT, source_word TEXT, is_partial INTEGER, is_wasei INTEGER, position INTEGER)`, joined the same way `word_kanji_map` already joins to `words`.
 - The XML only gives 3-letter ISO 639-2 codes (`dut`, `fre`, `chi`, etc. — 73 distinct codes appear across the real source data, the top ~15 by frequency being fre/ger/eng/ita/chi/lat/por/spa/kor/dut/rus/ara/san/gre/grc), never a human-readable language name — Jisho's "Dutch; Flemish" style display requires a static code→name lookup table maintained in the app itself (a plain Swift dictionary literal is enough; no new bundled data source needed, just deliberate work to write out the mapping for the languages that actually appear).
 - *Not started.*
 
+</details>
+
 <a id="us-29"></a>**US-29 — Show example sentences on dictionary entries.** As a learner, I want to see at least one real example sentence (Japanese + English) for a word on its results screen, the way Jisho.org shows Tatoeba sentences, so that I can see the word used in actual context instead of just an isolated reading and gloss list.
+
+<details>
+<summary>Show details</summary>
+
 - **Research: what the database needs.** Plain JMdict has no example sentences at all — they come from a separate EDRDG-maintained variant, `JMdict_e_examp` (downloaded and inspected directly: `http://ftp.edrdg.org/pub/Nihongo/JMdict_e_examp.gz`, ~72MB uncompressed, updated regularly), which embeds sentences from the **Tatoeba Project** directly into the relevant `<sense>` elements as a new child structure: `<example><ex_srce exsrc_type="tat">162365</ex_srce><ex_text>ＣＤプレイヤー</ex_text><ex_sent xml:lang="jpn">私は、このＣＤプレイヤーをただで得ました。</ex_sent><ex_sent xml:lang="eng">I got this CD player for free.</ex_sent></example>` (real entry, confirmed against the downloaded file) — `ex_srce` is the Tatoeba sentence ID, `ex_text` is the exact inflected form of the word as it appears in that sentence, and one-or-more `ex_sent` (per the DTD: `ex_srce,ex_text,ex_sent+`) give the sentence in each language.
 - This is a **different, separate source file from plain `JMdict_e`** (the one currently bundled) — swapping to it (or additionally parsing it) is itself a pipeline change, not just a new field to extract from what's already downloaded.
 - Real coverage, confirmed by parsing the actual file: 32,191 `<example>` blocks across 28,924 entries (some entries/senses have more than one) — 25,327 of those entries already have a kanji form (already in our import scope); the rest are katakana-only, again benefiting from **[US-23](#us-23)**. Confirmed real examples exist for words already used as running examples elsewhere in this log — パソコン has one (`パソコンに加え、携帯電話での利用が可能です`) — though not every word has one (~13% of all entries do), so this is a "when available" enhancement, not universal.
@@ -150,7 +214,13 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - **Licensing flag, not yet resolved:** Tatoeba sentences are distributed under **CC BY 2.0 FR** (confirmed via Tatoeba's own terms of use), which requires attribution — this is a per-sentence attribution requirement, a different (and arguably stricter) obligation than how JMdict/KANJIDIC2/JmdictFurigana's CC BY-SA is currently handled (credited only in this repo's `README.md`/PRD, with no in-app attribution anywhere at all). Before implementing, worth deciding where/how that attribution is shown in-app — the app has no About/Credits screen yet (same gap [US-11](#us-11) already flagged for a first-ever Settings screen), so this may need one.
 - *Not started.*
 
+</details>
+
 <a id="us-30"></a>**US-30 — Recognize conjugated verbs/adjectives, resolve to dictionary form.** As a learner, when OCR captures a conjugated word (e.g. 飼ってる, colloquial for 飼っている, "is keeping [a pet]"), I want the full conjugated span to get a bounding box and, when I tap it, resolve to the word's dictionary (plain) form (飼う, "to keep") — unless the conjugated form itself has its own dictionary entry, in which case that wins — rather than either missing the word entirely or only recognizing the bare kanji in isolation.
+
+<details>
+<summary>Show details</summary>
+
 - **How this surfaced:** discovered testing [US-19](#us-19) — 飼 (from 飼ってる) got OCR'd and bounding-boxed as a lone kanji, but 飼 alone has no standalone `words` entry the way 目 does, so it fell all the way back to the plain kanji detail view. The real fix isn't about single-kanji matching at all (that's [US-19](#us-19), working as intended) — it's that `Segmenter` never attempts to match a conjugated span against a word's *inflected* form in the first place; it only ever checks literal `surface_form`/`reading` equality.
 - **Research: this is a different category of problem from [US-27](#us-27)/28/29** (those needed a new data source or field; this needs a new *algorithm*, since JMdict already stores every verb/adjective in plain dictionary form — there's no conjugated-form data to import). Confirmed against the real bundled source: 飼う's entry is tagged `<pos>&v5u;</pos><pos>&vt;</pos>` (Godan verb, 'u'-ending; transitive) — the conjugation *class* needed to know which endings are even valid to strip is already present in JMdict, just not surfaced anywhere in our schema/UI yet (`words.part_of_speech` is populated but unused, per FR-13).
 - **Two real approaches, by prior art:**
@@ -160,7 +230,13 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - Realistic scope note: full conjugation coverage (all verb classes × all tenses/moods × colloquial contractions) is a large rule set to build and test well — an MVP would likely start with the highest-frequency patterns only (て-form/progressive てる・ている, plain past た・だ, negative ない, ます-form) rather than attempting full coverage in one pass.
 - *Not started.*
 
+</details>
+
 <a id="us-32"></a>**US-32 — Recognize hiragana-only words/expressions.** As a learner, I want a word or expression that's conventionally written entirely in hiragana (e.g. どうかしてる, "something's wrong with you") to be recognized and looked up too, not just kanji/katakana content, so that hiragana-only vocabulary doesn't hit a dead end.
+
+<details>
+<summary>Show details</summary>
+
 - **Research: this needs a real data source, but the picture is meaningfully riskier than [US-23](#us-23)'s katakana story, not just a variant of it.**
 - Confirmed against the real bundled dictionary: 2,911 kana-only JMdict entries have a pure-hiragana reading (currently excluded — `parse_jmdict` only imports kana-only entries whose reading is pure katakana, per [US-23](#us-23)). The user's own example, どうかしてる, is confirmed to be a real, standalone JMdict entry (`ent_seq 2736180`, tagged `exp`/expression) — its reading element even lists **both** どうかしている and the colloquial contraction どうかしてる as alternate readings of the same entry, so no conjugation/deinflection engine ([US-30](#us-30)) is needed for this specific example; it's purely an import-scope gap.
 - **The real problem: hiragana is also Japanese's grammar.** Unlike katakana (used almost exclusively for loanwords/names/onomatopoeia in real text), hiragana is *also* every particle (は, が, を, に, で, と, か, よ, ね...), auxiliary verb (た, ない, れる, せる, よう, たい...), and conjunction in the language — and JMdict has dictionary *entries* for these too, since it's a general-purpose dictionary. Confirmed directly: of the 2,911 hiragana-only entries, a large fraction at short lengths are exactly these grammatical fragments — e.g. length-1/2 entries include は, が, を, に, で, と, か, よ, ね, わ, な, た, だ, ない, れる, せる, よう, and dozens more, tagged `particle`/`auxiliary verb`/`conjunction`/`suffix`. Naively matching *any* hiragana run against the dictionary the way [US-23](#us-23) did for katakana would mean nearly every sentence's grammatical particles and verb endings become spuriously "matched," showing wrong/unhelpful definitions constantly — a fundamentally worse false-positive problem than katakana ever had.
@@ -179,29 +255,61 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - **Descoped for the primary use case.** Reviewing the full entry list directly (via a published data-review tool, filterable by length/POS/common) surfaced enough genuine edge cases that the user judged always-on hiragana matching to be scope creep against this app's core use case — reading kanji/vocabulary encountered out in the world (signs, menus, packaging), where a scan is quick and a wrong or noisy match matters more than for continuous reading. Not implementing this unconditionally. The underlying research and plan above remain valid, though — redirected into **[US-35](#us-35)**, which proposes gating this exact capability behind an opt-in setting for a different, real use case (reading books) where the calculus is different.
 - *Not started — descoped as an always-on feature; see [US-35](#us-35).*
 
+</details>
+
 <a id="us-35"></a>**US-35 — Add a "book reading mode" setting for hiragana-compound recognition.** As a learner reading a physical book (rather than scanning a quick sign or menu), I want to opt into recognizing hiragana-only words and expressions — including short, grammatical ones (だけど, なのに, けれど) that would be noisy for a quick out-in-the-world scan — via a toggle, since when working through continuous text, even functional/grammatical vocabulary is worth being able to look up, and the calculus that made [US-32](#us-32) scope creep for the primary use case doesn't hold here.
+
+<details>
+<summary>Show details</summary>
+
 - Directly follows from [US-32](#us-32)'s descoping: the underlying matching approach [US-32](#us-32) already researched and planned (hiragana runs, length ≥ 3 floor, no fallback token) doesn't need to be redesigned — it needs to be **opt-in** rather than always-on, scoped to a second, distinct use case (continuous reading) rather than the app's primary one (quick lookups from photos of text encountered in the wild).
 - Once gated behind an explicit "I'm reading a book" mode, it may also be worth reconsidering whether the length floor itself should relax further in that mode specifically (e.g. even 1-2 character particles could be legitimately useful mid-book, where they wouldn't be for a quick sign scan) — not decided, worth its own pass when this is picked up.
 - The app currently has **no settings/preferences screen at all** — this would be the **second** story (after **[US-11](#us-11)**) to need one, strengthening the case for building shared settings infrastructure once rather than bespoke per-feature toggles.
 - *Not started.*
 
+</details>
+
 <a id="us-20"></a>**US-20 — Show vocab tags (part of speech, common, JLPT, WaniKani) in results.** As a learner, I want to see a word's part of speech, whether it's a common word, and (once available) its JLPT/WaniKani level directly on the results screen, so that I get more context about the word without leaving the app.
+
+<details>
+<summary>Show details</summary>
+
 - `part_of_speech` and `is_common` already exist in the `words` schema (populated from JMdict) but per FR-13 are deliberately not surfaced in the v1 UI — this story is exactly the "later version" FR-13 anticipated.
 - JLPT/WaniKani display depends on [US-17](#us-17) actually having that data available.
 - *Not started.*
 
+</details>
+
 <a id="us-21"></a>**US-21 — Group similar/related dictionary senses instead of one long list.** As a learner, I want related meanings for a word or kanji grouped together (the way Jisho.org visually clusters related senses), instead of a single flat bulleted list, so that I can more quickly tell which meanings are closely related versus genuinely distinct usages.
+
+<details>
+<summary>Show details</summary>
+
 - Would likely require re-examining how `meanings` are stored/parsed from JMdict's `<sense>` groupings (currently flattened into one JSON array per entry in `build_dictionary.py`) to preserve sense-group boundaries.
 - *Not started.*
 
+</details>
+
 <a id="us-22"></a>**US-22 — Tap a kanji breakdown entry for a detail page with more tags.** As a learner, I want to tap on one of the kanji rows in a compound's breakdown and open a dedicated, more detailed page for that character — including tags like Jōyō status, frequency rank, JLPT level, and WaniKani level — so that I can dig deeper into one specific kanji without that detail cluttering the compact breakdown row.
+
+<details>
+<summary>Show details</summary>
+
 - `frequency_rank` and `jlpt_level` already exist in the `kanji` schema (populated from KANJIDIC2) but aren't surfaced anywhere in the UI yet.
 - Depends on [US-16](#us-16) for Jōyō/WaniKani fields existing at all.
 - *Not started.*
 
+</details>
+
 <a id="us-24"></a>**US-24 — Expand vocab matching to names of people and organizations.** As a learner, I want proper nouns (people's names, company/organization names) to resolve to a dictionary entry when possible, instead of always hitting "no dictionary entry found," so that I'm not stuck on names I encounter while reading.
+
+<details>
+<summary>Show details</summary>
+
 - JMdict itself excludes most proper nouns; this would likely need EDRDG's separate `ENAMDICT`/`JMnedict` name dictionary as an additional data source in the build pipeline.
 - *Not started.*
+
+</details>
 
 ## From the original PRD (v0)
 
