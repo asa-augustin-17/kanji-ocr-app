@@ -2,6 +2,8 @@
 
 Offline iOS kanji/compound OCR + dictionary lookup. See [docs/Kanji_Scanner_PRD_v1.md.pdf](docs/Kanji_Scanner_PRD_v1.md.pdf) for the full spec, [STORIES.md](STORIES.md) for the user story log, and [BUGS.md](BUGS.md) for the bug log.
 
+Requires [Git LFS](https://git-lfs.com) (`brew install git-lfs && git lfs install`) — the bundled `kanji_scanner.sqlite` (~80MB) is tracked via LFS, so a clone without it checks out a small pointer file instead of the real database and the app won't build.
+
 ## Layout
 
 - `data-pipeline/` — Python script that builds the bundled dictionary from KANJIDIC2 + JMdict (EDRDG, CC BY-SA) and [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana) (CC BY-SA) for per-character furigana alignment (US-25).
