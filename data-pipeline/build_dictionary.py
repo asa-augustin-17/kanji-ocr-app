@@ -44,7 +44,8 @@ CREATE TABLE words (
     reading TEXT NOT NULL,
     meanings TEXT NOT NULL,
     part_of_speech TEXT,
-    is_common INTEGER NOT NULL DEFAULT 0
+    is_common INTEGER NOT NULL DEFAULT 0,
+    furigana_segments TEXT
 );
 
 CREATE TABLE word_kanji_map (
@@ -184,6 +185,33 @@ def parse_jmdict(path):
         elem.clear()
 
 
+def parse_jmdict_furigana(path):
+    """Loads the JmdictFurigana release (github.com/Doublevil/JmdictFurigana,
+    CC BY-SA, same license family as JMdict/KANJIDIC2) into a dict keyed by
+    (surface_form, reading) - the same key `parse_jmdict` produces a word
+    row under. Values are per-run furigana segments in on-page order, each
+    {"text": <substring of surface_form>, "reading": <kana, or None if that
+    substring is already kana in the surface form>}. A run can span more
+    than one kanji when they share a single indivisible reading (jukujikun,
+    e.g. 大人 -> おとな in 大人買い) - this mirrors the source data's own
+    segmentation rather than forcing one-kanji-per-segment.
+
+    Covers ~76% of JMdict entries (the rest, mostly kana-only, don't need
+    this); words with no match here fall back to whole-word furigana in the
+    app (US-25).
+    """
+    with open(path, encoding="utf-8-sig") as f:
+        raw_entries = json.load(f)
+
+    segments_by_key = {}
+    for entry in raw_entries:
+        key = (entry["text"], entry["reading"])
+        segments_by_key[key] = [
+            {"text": seg["ruby"], "reading": seg.get("rt")} for seg in entry["furigana"]
+        ]
+    return segments_by_key
+
+
 def build():
     OUTPUT.mkdir(exist_ok=True)
     if DB_PATH.exists():
@@ -218,19 +246,28 @@ def build():
     conn.commit()
     print(f"Inserted {kanji_count} kanji.")
 
+    print("Parsing JmdictFurigana...")
+    furigana_by_key = parse_jmdict_furigana(SOURCES / "JmdictFurigana.json")
+    print(f"Loaded furigana segments for {len(furigana_by_key)} (surface form, reading) pairs.")
+
     print("Parsing JMdict...")
     word_count = 0
     map_count = 0
+    furigana_hit_count = 0
     for row in parse_jmdict(SOURCES / "JMdict_e"):
+        segments = furigana_by_key.get((row["surface_form"], row["reading"]))
+        if segments is not None:
+            furigana_hit_count += 1
         cur = conn.execute(
-            "INSERT INTO words (surface_form, reading, meanings, part_of_speech, is_common) "
-            "VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO words (surface_form, reading, meanings, part_of_speech, is_common, furigana_segments) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
             (
                 row["surface_form"],
                 row["reading"],
                 json.dumps(row["meanings"], ensure_ascii=False),
                 row["part_of_speech"],
                 1 if row["is_common"] else 0,
+                json.dumps(segments, ensure_ascii=False) if segments is not None else None,
             ),
         )
         word_id = cur.lastrowid
@@ -252,6 +289,7 @@ def build():
             conn.commit()
     conn.commit()
     print(f"Inserted {word_count} words, {map_count} word-kanji mappings.")
+    print(f"{furigana_hit_count}/{word_count} words have per-character furigana segments.")
 
     print("Building indexes (already created in schema)... done.")
     conn.execute("ANALYZE")

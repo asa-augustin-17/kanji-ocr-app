@@ -76,18 +76,80 @@ private struct NoCompoundMatchView: View {
     }
 }
 
-/// The compound word entry: reading and meanings at the top (US-4 AC).
+/// The compound word entry: reading and meanings at the top (US-4 AC). The
+/// reading is shown as furigana directly above the surface form (US-18),
+/// positioned per-character/per-run rather than as one line spanning the
+/// whole word (US-25) whenever `word.furiganaSegments` has that alignment
+/// data; otherwise it falls back to the whole-word furigana US-18 shipped
+/// first, for the small fraction of words JmdictFurigana doesn't cover.
 private struct WordSection: View {
     let word: WordEntry
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(word.surfaceForm)
-                .font(.system(size: 48, weight: .bold))
-            Text(word.reading)
-                .font(.title3)
-                .foregroundStyle(.secondary)
+            if let segments = word.furiganaSegments, !segments.isEmpty {
+                SegmentedFuriganaText(segments: segments)
+            } else {
+                WholeWordFuriganaText(surfaceForm: word.surfaceForm, reading: word.reading)
+            }
             MeaningsList(meanings: word.meanings)
+        }
+    }
+}
+
+/// True per-character furigana (US-25): each run (one or more kanji sharing
+/// a reading, or a bare kana run with none) gets its own small reading
+/// positioned directly above just that run, the way real printed Japanese
+/// and tools like Yomitan do — rather than one reading spanning the whole
+/// word, which doesn't help a learner tell which reading belongs to which
+/// character in a mixed kanji/kana compound.
+///
+/// `HStack(alignment: .bottom)` is enough to keep every run's base
+/// characters sitting on the same visual line regardless of whether that
+/// run has a reading above it: each run is its own `VStack` (furigana line
+/// only present when that segment has one), and aligning the row by
+/// `.bottom` lines up the base-character `Text` views' bottom edges across
+/// runs of differing total height. No cross-segment width measurement
+/// needed — deliberately avoiding the kind of measured/shared-layout
+/// approach that repeatedly failed for the kanji breakdown rows (BUG-011).
+private struct SegmentedFuriganaText: View {
+    let segments: [FuriganaSegment]
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
+                VStack(spacing: 0) {
+                    if let reading = segment.reading {
+                        Text(reading)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(segment.text)
+                        .font(.system(size: 48, weight: .bold))
+                }
+                .padding(.horizontal, 1)
+            }
+        }
+    }
+}
+
+/// Fallback for the small fraction of words with no per-character alignment
+/// data (US-25's coverage gap): the whole reading centered above the whole
+/// surface form — the behavior US-18 originally shipped. A `VStack` with
+/// `alignment: .center` is enough: since neither `Text` has a forced width,
+/// the stack sizes itself to its widest child (the surface form) and
+/// centers the other (the reading) over it.
+private struct WholeWordFuriganaText: View {
+    let surfaceForm: String
+    let reading: String
+
+    var body: some View {
+        VStack(alignment: .center, spacing: 0) {
+            Text(reading)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text(surfaceForm)
+                .font(.system(size: 48, weight: .bold))
         }
     }
 }

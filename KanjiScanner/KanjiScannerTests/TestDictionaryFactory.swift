@@ -33,7 +33,8 @@ enum TestDictionaryFactory {
                     reading TEXT NOT NULL,
                     meanings TEXT NOT NULL,
                     part_of_speech TEXT,
-                    is_common INTEGER NOT NULL DEFAULT 0
+                    is_common INTEGER NOT NULL DEFAULT 0,
+                    furigana_segments TEXT
                 );
                 CREATE TABLE word_kanji_map (
                     word_id INTEGER NOT NULL,
@@ -53,10 +54,19 @@ enum TestDictionaryFactory {
                 return db.lastInsertedRowID
             }
 
-            func insertWord(_ surfaceForm: String, reading: String, meanings: [String], kanjiIDs: [Int64]) throws {
+            func insertWord(
+                _ surfaceForm: String,
+                reading: String,
+                meanings: [String],
+                kanjiIDs: [Int64],
+                furiganaSegments: [FuriganaSegment]? = nil
+            ) throws {
                 try db.execute(
-                    sql: "INSERT INTO words (surface_form, reading, meanings, is_common) VALUES (?, ?, ?, 1)",
-                    arguments: [surfaceForm, reading, json(meanings)]
+                    sql: """
+                    INSERT INTO words (surface_form, reading, meanings, is_common, furigana_segments)
+                    VALUES (?, ?, ?, 1, ?)
+                    """,
+                    arguments: [surfaceForm, reading, json(meanings), furiganaSegments.map(jsonSegments)]
                 )
                 let wordID = db.lastInsertedRowID
                 for (position, kanjiID) in kanjiIDs.enumerated() {
@@ -74,7 +84,16 @@ enum TestDictionaryFactory {
             let go = try insertKanji("語", onyomi: ["ゴ"], kunyomi: ["かた.る"], meanings: ["word", "language"])
             _ = try insertKanji("犬", onyomi: [], kunyomi: ["いぬ"], meanings: ["dog"])
 
-            try insertWord("漢字", reading: "かんじ", meanings: ["kanji", "Chinese character"], kanjiIDs: [kan, ji])
+            try insertWord(
+                "漢字",
+                reading: "かんじ",
+                meanings: ["kanji", "Chinese character"],
+                kanjiIDs: [kan, ji],
+                furiganaSegments: [
+                    FuriganaSegment(text: "漢", reading: "かん"),
+                    FuriganaSegment(text: "字", reading: "じ"),
+                ]
+            )
             try insertWord("日本語", reading: "にほんご", meanings: ["Japanese language"], kanjiIDs: [nichi, hon, go])
             try insertWord("日本", reading: "にほん", meanings: ["Japan"], kanjiIDs: [nichi, hon])
         }
@@ -84,6 +103,11 @@ enum TestDictionaryFactory {
 
     private static func json(_ strings: [String]) -> String {
         let data = try! JSONEncoder().encode(strings)
+        return String(data: data, encoding: .utf8)!
+    }
+
+    private static func jsonSegments(_ segments: [FuriganaSegment]) -> String {
+        let data = try! JSONEncoder().encode(segments)
         return String(data: data, encoding: .utf8)!
     }
 }

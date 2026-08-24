@@ -6,6 +6,7 @@ Tracks every user story driving Kanji Scanner — both the original PRD stories 
 - **Not Started**
 - **Implemented** — code complete, built against the acceptance criteria below
 - **Verified** — confirmed working on a physical device by the user
+- **Closed** — implemented, but not receiving further iteration under this ID; either superseded by a follow-up story or intentionally settled as-is
 
 ## v1 closure review (2026-08-23)
 
@@ -106,13 +107,15 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 | ID | Story | Status | Source | Date Added | Version |
 |----|---|---|---|---|---|
+| US-26 | Tune per-character furigana sizing/legibility | Not Started | User request | 2026-08-23 | Backlog |
+| US-25 | Per-character furigana for compound words (supersedes US-18) | Closed | User request | 2026-08-23 | Backlog |
 | US-24 | Expand vocab matching to names of people and organizations | Not Started | User request | 2026-08-23 | Backlog |
 | US-23 | Expand vocab matching to katakana words | Not Started | User request | 2026-08-23 | Backlog |
 | US-22 | Tap a kanji breakdown entry for a detail page with more tags | Not Started | User request | 2026-08-23 | Backlog |
 | US-21 | Group similar/related dictionary senses instead of one long list | Not Started | User request | 2026-08-23 | Backlog |
 | US-20 | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Not Started | User request | 2026-08-23 | Backlog |
 | US-19 | Treat a single detected character as a vocab term, not just a kanji | Not Started | User request | 2026-08-23 | Backlog |
-| US-18 | Display vocab furigana above the characters, not below | Not Started | User request | 2026-08-23 | Backlog |
+| US-18 | Display vocab furigana above the characters, not below | Closed | User request | 2026-08-23 | Backlog |
 | US-17 | Add WaniKani level and JLPT level to the words table | Not Started | User request | 2026-08-23 | Backlog |
 | US-16 | Add WaniKani level and Jōyō status to the kanji table | Not Started | User request | 2026-08-23 | Backlog |
 | US-15 | Smooth, decaying scroll deceleration on the captured photo | Not Started | User request | 2026-08-23 | Backlog |
@@ -156,6 +159,16 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 **US-18 — Display vocab furigana above the characters, not below.** As a learner, I want the reading of a compound word shown as furigana directly above its kanji (as it appears in real printed Japanese), so that the results screen reads the way native materials actually present readings, rather than as a separate line underneath.
 - Currently the word's reading is shown as a full separate line below the surface form (`WordSection` in `ResultsView.swift`), not per-character ruby-style furigana above each kanji.
+- *Closed.* Implemented first as whole-word furigana (the reading centered above the entire surface form, since JMdict only provides one reading per word with no per-kanji alignment data). On review, the user determined this wasn't sufficient for mixed kanji/kana compounds (e.g. 生み心地) — a single reading spanning multiple characters doesn't help a learner tell which reading belongs to which kanji. Superseded by **US-25**, which solves the actual per-character alignment problem; closing this story rather than continuing to iterate under it. The whole-word rendering built here (`WholeWordFuriganaText` in `ResultsView.swift`) survives as US-25's fallback for words outside its data source's coverage.
+
+**US-25 — Per-character furigana for compound words (supersedes US-18).** As a learner, when I look up a compound word that mixes kanji and kana (e.g. 生み心地), I want the furigana reading split and positioned over each individual kanji (or kanji run), the way real printed Japanese and tools like Yomitan do, so that I can tell which reading belongs to which character and actually learn the word instead of just seeing one undifferentiated reading string above it.
+- JMdict itself has no per-kanji reading alignment data, so this required a new external data source: [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana) (CC BY-SA, same license family as JMdict/KANJIDIC2), bundled into `data-pipeline/build_dictionary.py` and joined to `words` by `(surface_form, reading)` into a new `furigana_segments` column. Covers 221,811 of 230,958 words in the bundled dictionary (96%); the remaining ~4% fall back to US-18's whole-word furigana.
+- Rendered via a new `SegmentedFuriganaText` view in `ResultsView.swift`: a plain SwiftUI `HStack(alignment: .bottom)` of per-run mini-`VStack`s (small reading above + big characters below, or just the bare characters for a run that's already kana), rather than CoreText's `CTRubyAnnotation` — deliberately kept to plain SwiftUI, consistent with this codebase's preference for simple explicit layout over clever/measured layout (see BUG-011's saga in BUGS.md).
+- Correctly groups jukujikun (irregular readings spanning multiple kanji as one indivisible unit, e.g. 大人 → おとな within 大人買い) as a single run rather than forcing one kanji per segment, matching how the source data itself segments these.
+- *Closed.* User-confirmed on-device ("This is a pass"). Follow-up sizing/legibility tuning (the reading font was bumped once already, `.caption2` → `.caption`, per user feedback that jukujikun readings looked too small) is tracked separately as **US-26** rather than continuing under this ID.
+
+**US-26 — Tune per-character furigana sizing/legibility.** As a learner, after getting true per-character furigana (US-25), I want its size/legibility kept tunable and refined further, so that readings stay comfortably legible across different words and screen sizes rather than settling permanently on whatever size shipped first.
+- Direct follow-up to US-25: the reading font was already bumped once this session (`Font.caption2` → `Font.caption` in `SegmentedFuriganaText`, `ResultsView.swift`) after the user found jukujikun readings (e.g. おとな over 大人) too small at the original size — this story tracks continuing that tuning.
 - *Not started.*
 
 **US-19 — Treat a single detected character as a vocab term, not just a kanji.** As a learner, when I tap a single kanji that's also a standalone valid word (many single kanji are), I want to see the vocab-term layout (word meaning/reading at top, kanji breakdown below it) — the same hierarchy multi-kanji compounds already get — rather than only the plain kanji detail view.

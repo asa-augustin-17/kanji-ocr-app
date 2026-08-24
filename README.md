@@ -4,7 +4,7 @@ Offline iOS kanji/compound OCR + dictionary lookup. See [docs/Kanji_Scanner_PRD_
 
 ## Layout
 
-- `data-pipeline/` — Python script that builds the bundled dictionary from KANJIDIC2 + JMdict (EDRDG, CC BY-SA).
+- `data-pipeline/` — Python script that builds the bundled dictionary from KANJIDIC2 + JMdict (EDRDG, CC BY-SA) and [JmdictFurigana](https://github.com/Doublevil/JmdictFurigana) (CC BY-SA) for per-character furigana alignment (US-25).
 - `KanjiScanner/` — the iOS app (XcodeGen-managed project).
 
 ## Rebuilding the dictionary database
@@ -15,7 +15,7 @@ python3 build_dictionary.py
 cp output/kanji_scanner.sqlite ../KanjiScanner/KanjiScanner/Resources/
 ```
 
-Only needed if you update the source XML in `data-pipeline/sources/` or change the schema. The current output is already copied into `KanjiScanner/Resources/`.
+Requires `data-pipeline/sources/JMdict_e`, `kanjidic2.xml`, and `JmdictFurigana.json` (the latter from [JmdictFurigana's latest release](https://github.com/Doublevil/JmdictFurigana/releases/latest) — download the `JmdictFurigana.json.tar.gz` asset and extract it into `sources/`). Only needed if you update any of those source files or change the schema. The current output is already copied into `KanjiScanner/Resources/`.
 
 ## Opening the app project
 

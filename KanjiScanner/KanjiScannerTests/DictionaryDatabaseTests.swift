@@ -26,6 +26,28 @@ final class DictionaryDatabaseTests: XCTestCase {
         XCTAssertEqual(result.kanjiBreakdown.map(\.character), ["漢", "字"])
     }
 
+    func testCompoundLookupReturnsPerCharacterFuriganaSegments() {
+        // US-25: each kanji gets its own reading rather than one reading
+        // spanning the whole word.
+        let result = database.lookup(token: "漢字")
+
+        XCTAssertEqual(
+            result.word?.furiganaSegments,
+            [
+                FuriganaSegment(text: "漢", reading: "かん"),
+                FuriganaSegment(text: "字", reading: "じ"),
+            ]
+        )
+    }
+
+    func testWordWithNoFuriganaDataHasNilSegments() {
+        // US-25's fallback path: words JmdictFurigana doesn't cover should
+        // decode to nil, not an empty array or a crash.
+        let result = database.lookup(token: "日本語")
+
+        XCTAssertNil(result.word?.furiganaSegments)
+    }
+
     func testMissingSurfaceFormReturnsNoWord() {
         XCTAssertNil(database.wordEntry(surfaceForm: "存在しない単語"))
     }

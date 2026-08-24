@@ -34,6 +34,18 @@ extension KanjiEntry: FetchableRecord {
     }
 }
 
+/// One furigana run within a word (US-25): `text` is a substring of the
+/// word's surface form, `reading` is the kana that goes above it, or `nil`
+/// if `text` is already kana in the surface form (no reading needed). A run
+/// can span more than one character when kanji share one indivisible
+/// reading (jukujikun, e.g. "大人" -> "おとな" within 大人買い) - this
+/// mirrors how the source data (JmdictFurigana) segments it, rather than
+/// forcing one character per run.
+struct FuriganaSegment: Equatable, Codable {
+    let text: String
+    let reading: String?
+}
+
 struct WordEntry: Identifiable, Equatable {
     let id: Int64
     let surfaceForm: String
@@ -41,6 +53,10 @@ struct WordEntry: Identifiable, Equatable {
     let meanings: [String]
     let partOfSpeech: String?
     let isCommon: Bool
+    /// Per-character furigana alignment (US-25), or `nil` for the ~4% of
+    /// words JmdictFurigana doesn't cover - those fall back to whole-word
+    /// furigana in the UI (US-18's original behavior).
+    let furiganaSegments: [FuriganaSegment]?
 }
 
 extension WordEntry: FetchableRecord {
@@ -56,6 +72,13 @@ extension WordEntry: FetchableRecord {
         }
         partOfSpeech = row["part_of_speech"]
         isCommon = row["is_common"]
+
+        let furiganaJSON = row["furigana_segments"] as String?
+        if let furiganaJSON, let data = furiganaJSON.data(using: .utf8) {
+            furiganaSegments = try? JSONDecoder().decode([FuriganaSegment].self, from: data)
+        } else {
+            furiganaSegments = nil
+        }
     }
 }
 
