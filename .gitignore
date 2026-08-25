@@ -7,3 +7,6 @@ KanjiScanner/KanjiScanner.xcodeproj/xcuserdata/
 KanjiScanner/KanjiScanner.xcodeproj/project.xcworkspace/xcuserdata/
 KanjiScanner/DerivedData/
 .DS_Store
+
+# Personal Claude Code permission overrides
+.claude/settings.local.json

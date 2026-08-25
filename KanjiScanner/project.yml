@@ -39,6 +39,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
+        DEVELOPMENT_TEAM: XXQ9DMRYW7
 
   KanjiScannerTests:
     type: bundle.unit-test
