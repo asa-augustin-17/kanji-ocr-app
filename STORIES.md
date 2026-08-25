@@ -73,7 +73,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | [US-15](#us-15) | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | — |
 | [US-16](#us-16) | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | — |
 | [US-17](#us-17) | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | — |
-| [US-20](#us-20) | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — |
+| [US-20](#us-20) | Show vocab tags (common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — |
 | [US-22](#us-22) | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | — |
 | [US-24](#us-24) | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | — |
 | [US-27](#us-27) | Note when a word is usually written using kana alone | Dictionary | Not Started | 2026-08-24 | — |
@@ -256,13 +256,14 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 </details>
 
-<a id="us-20"></a>**US-20 — Show vocab tags (part of speech, common, JLPT, WaniKani) in results.** As a learner, I want to see a word's part of speech, whether it's a common word, and (once available) its JLPT/WaniKani level directly on the results screen, so that I get more context about the word without leaving the app.
+<a id="us-20"></a>**US-20 — Show vocab tags (common, JLPT, WaniKani) in results.** As a learner, I want to see whether a word is common, and (once available) its JLPT/WaniKani level, directly on the results screen, so that I get more context about the word without leaving the app.
 
 <details>
 <summary>Show details</summary>
 
-- `part_of_speech` and `is_common` already exist in the `words` schema (populated from JMdict) but per FR-13 are deliberately not surfaced in the v1 UI — this story is exactly the "later version" FR-13 anticipated.
+- `is_common` already exists in the `words` schema (populated from JMdict) but per FR-13 is deliberately not surfaced in the v1 UI — this story is exactly the "later version" FR-13 anticipated.
 - JLPT/WaniKani display depends on [US-17](#us-17) actually having that data available.
+- **Part of speech removed from this story's scope** — it's already surfaced, per-sense, via the sense-group headers [US-21](#us-21)/[US-36](#us-36) shipped (e.g. "I-adjective (keiyoushi)"), which is a better fit for it than a single word-level tag would have been anyway (a word can have senses spanning more than one part of speech, e.g. 良い's trailing "easy to ..." sense is a suffix, not just an i-adjective).
 - *Not started.*
 
 </details>
