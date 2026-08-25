@@ -58,7 +58,7 @@ enum TestDictionaryFactory {
             func insertWord(
                 _ surfaceForm: String,
                 reading: String,
-                meanings: [String],
+                senses: [WordSense],
                 kanjiIDs: [Int64],
                 furiganaSegments: [FuriganaSegment]? = nil
             ) throws {
@@ -67,7 +67,7 @@ enum TestDictionaryFactory {
                     INSERT INTO words (surface_form, reading, meanings, is_common, furigana_segments)
                     VALUES (?, ?, ?, 1, ?)
                     """,
-                    arguments: [surfaceForm, reading, json(meanings), furiganaSegments.map(jsonSegments)]
+                    arguments: [surfaceForm, reading, jsonSenses(senses), furiganaSegments.map(jsonSegments)]
                 )
                 let wordID = db.lastInsertedRowID
                 for (position, kanjiID) in kanjiIDs.enumerated() {
@@ -76,6 +76,27 @@ enum TestDictionaryFactory {
                         arguments: [wordID, kanjiID, position]
                     )
                 }
+            }
+
+            /// Convenience for the common case of a single-sense word with no
+            /// pos data to seed (US-21 changed `meanings` from a flat gloss
+            /// list to per-sense data) - wraps the given glosses into one
+            /// `WordSense` so every existing simple call site below keeps
+            /// working unchanged.
+            func insertWord(
+                _ surfaceForm: String,
+                reading: String,
+                meanings: [String],
+                kanjiIDs: [Int64],
+                furiganaSegments: [FuriganaSegment]? = nil
+            ) throws {
+                try insertWord(
+                    surfaceForm,
+                    reading: reading,
+                    senses: [WordSense(pos: [], glosses: meanings)],
+                    kanjiIDs: kanjiIDs,
+                    furiganaSegments: furiganaSegments
+                )
             }
 
             let kan = try insertKanji("漢", onyomi: ["カン"], kunyomi: [], meanings: ["Sino-", "China"])
@@ -127,6 +148,11 @@ enum TestDictionaryFactory {
 
     private static func jsonSegments(_ segments: [FuriganaSegment]) -> String {
         let data = try! JSONEncoder().encode(segments)
+        return String(data: data, encoding: .utf8)!
+    }
+
+    private static func jsonSenses(_ senses: [WordSense]) -> String {
+        let data = try! JSONEncoder().encode(senses)
         return String(data: data, encoding: .utf8)!
     }
 }

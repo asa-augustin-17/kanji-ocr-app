@@ -46,17 +46,56 @@ struct FuriganaSegment: Equatable, Codable {
     let reading: String?
 }
 
+/// One JMdict `<sense>`: its own part-of-speech tags (unordered - JMdict's
+/// real data has entries where the same tags appear in a different order
+/// across senses, so grouping must compare `pos` as a set, never by string
+/// or ordered-array equality) and its English glosses (US-21).
+struct WordSense: Equatable, Codable {
+    let pos: [String]
+    let glosses: [String]
+}
+
+/// A run of consecutive `WordSense`s that share the same usage context
+/// (identical `pos`, as a set) - JMdict's own structural signal for a
+/// meaning-context boundary (e.g. 切る's core "to cut" senses vs. its
+/// `suf`-tagged "-切る" senses), the same signal Jisho.org's numbered
+/// sense groups are built from (US-21).
+struct SenseGroup: Equatable {
+    let pos: [String]
+    let senses: [WordSense]
+
+    /// Merges consecutive senses whose `pos` sets are equal into one group,
+    /// preserving order. Pure/stateless - no semantic clustering, since
+    /// JMdict has no signal finer than pos for this.
+    static func group(_ senses: [WordSense]) -> [SenseGroup] {
+        var groups: [SenseGroup] = []
+        for sense in senses {
+            if let last = groups.last, Set(last.pos) == Set(sense.pos) {
+                groups[groups.count - 1] = SenseGroup(pos: last.pos, senses: last.senses + [sense])
+            } else {
+                groups.append(SenseGroup(pos: sense.pos, senses: [sense]))
+            }
+        }
+        return groups
+    }
+}
+
 struct WordEntry: Identifiable, Equatable {
     let id: Int64
     let surfaceForm: String
     let reading: String
-    let meanings: [String]
+    let senses: [WordSense]
     let partOfSpeech: String?
     let isCommon: Bool
     /// Per-character furigana alignment (US-25), or `nil` for the ~4% of
     /// words JmdictFurigana doesn't cover - those fall back to whole-word
     /// furigana in the UI (US-18's original behavior).
     let furiganaSegments: [FuriganaSegment]?
+
+    /// Consecutive senses grouped by shared usage context (US-21), for
+    /// Jisho-style numbered/headed display. Computed on access rather than
+    /// stored at decode time - cheap, and keeps `init(row:)` simple.
+    var senseGroups: [SenseGroup] { SenseGroup.group(senses) }
 }
 
 extension WordEntry: FetchableRecord {
@@ -66,9 +105,9 @@ extension WordEntry: FetchableRecord {
         reading = row["reading"]
         let json = row["meanings"] as String?
         if let json, let data = json.data(using: .utf8) {
-            meanings = (try? JSONDecoder().decode([String].self, from: data)) ?? []
+            senses = (try? JSONDecoder().decode([WordSense].self, from: data)) ?? []
         } else {
-            meanings = []
+            senses = []
         }
         partOfSpeech = row["part_of_speech"]
         isCommon = row["is_common"]

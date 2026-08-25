@@ -99,7 +99,7 @@ private struct WordSection: View {
             } else {
                 WholeWordFuriganaText(surfaceForm: word.surfaceForm, reading: word.reading)
             }
-            MeaningsList(meanings: word.meanings)
+            GroupedMeaningsList(groups: word.senseGroups)
         }
     }
 }
@@ -284,5 +284,41 @@ private struct MeaningsList: View {
             }
         }
         .font(.body)
+    }
+}
+
+/// Word meanings grouped by usage context (US-21) - Jisho.org-style, e.g.
+/// 切る's core "to cut" senses separated from its "-切る" suffix senses,
+/// instead of one long flat bullet per gloss. Every sense is numbered,
+/// continuously across all groups starting at 1 - including a genuinely
+/// single-sense word, which just shows "1." rather than an unlabeled
+/// bullet, so numbering is never a signal of "this word has many senses."
+/// A group's pos header is shown once per group (not repeated per sense,
+/// unlike real Jisho) when non-empty - repeating it added no information
+/// and worked against this story's main goal of a shorter results screen.
+private struct GroupedMeaningsList: View {
+    let groups: [SenseGroup]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(Array(groups.enumerated()), id: \.offset) { groupIndex, group in
+                VStack(alignment: .leading, spacing: 4) {
+                    if !group.pos.isEmpty {
+                        Text(group.pos.joined(separator: ", "))
+                            .font(.caption)
+                            .textCase(.uppercase)
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(Array(group.senses.enumerated()), id: \.offset) { senseIndex, sense in
+                        Text("\(senseNumber(groupIndex: groupIndex, senseIndex: senseIndex)). \(sense.glosses.joined(separator: "; "))")
+                    }
+                }
+            }
+        }
+        .font(.body)
+    }
+
+    private func senseNumber(groupIndex: Int, senseIndex: Int) -> Int {
+        groups[..<groupIndex].reduce(0) { $0 + $1.senses.count } + senseIndex + 1
     }
 }

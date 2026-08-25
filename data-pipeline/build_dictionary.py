@@ -128,17 +128,35 @@ def parse_jmdict(path):
         k_eles = elem.findall("k_ele")
         r_eles = elem.findall("r_ele")
 
+        # US-21: preserve per-sense structure instead of flattening every
+        # gloss from every <sense> into one list. Each sense becomes
+        # {"pos": [...], "glosses": [...]} so the app can group consecutive
+        # senses that share a usage context (Jisho-style headers) instead of
+        # showing one long undifferentiated bullet list.
         meanings = []
         pos_set = []
+        last_pos = []
         for sense in elem.findall("sense"):
-            for pos in sense.findall("pos"):
-                if pos.text and pos.text not in pos_set:
-                    pos_set.append(pos.text)
+            this_pos = [pos.text for pos in sense.findall("pos") if pos.text]
+            for pos_text in this_pos:
+                if pos_text not in pos_set:
+                    pos_set.append(pos_text)
+            # Per JMdict's DTD, a sense with no explicit <pos> inherits the
+            # nearest earlier sense's pos - currently a no-op against this
+            # bundled JMdict_e (every sense states its pos explicitly here),
+            # but cheap to implement correctly so a future source refresh
+            # doesn't silently break grouping.
+            if this_pos:
+                last_pos = this_pos
+
+            glosses = []
             for gloss in sense.findall("gloss"):
                 lang = gloss.get("{http://www.w3.org/XML/1998/namespace}lang")
                 if lang is None or lang == "eng":
                     if gloss.text:
-                        meanings.append(gloss.text)
+                        glosses.append(gloss.text)
+            if glosses:
+                meanings.append({"pos": last_pos, "glosses": glosses})
 
         part_of_speech = "; ".join(pos_set) if pos_set else None
 

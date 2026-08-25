@@ -22,7 +22,7 @@ final class DictionaryDatabaseTests: XCTestCase {
         let result = database.lookup(token: "漢字")
 
         XCTAssertEqual(result.word?.reading, "かんじ")
-        XCTAssertEqual(result.word?.meanings, ["kanji", "Chinese character"])
+        XCTAssertEqual(result.word?.senses.flatMap(\.glosses), ["kanji", "Chinese character"])
         XCTAssertEqual(result.kanjiBreakdown.map(\.character), ["漢", "字"])
     }
 

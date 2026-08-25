@@ -74,7 +74,6 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | [US-16](#us-16) | Add WaniKani level and Jōyō status to the kanji table | Databases | Not Started | 2026-08-23 | — |
 | [US-17](#us-17) | Add WaniKani level and JLPT level to the words table | Databases | Not Started | 2026-08-23 | — |
 | [US-20](#us-20) | Show vocab tags (part of speech, common, JLPT, WaniKani) in results | Dictionary | Not Started | 2026-08-23 | — |
-| [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Not Started | 2026-08-23 | — |
 | [US-22](#us-22) | Tap a kanji breakdown entry for a detail page with more tags | Dictionary | Not Started | 2026-08-23 | — |
 | [US-24](#us-24) | Expand vocab matching to names of people and organizations | Dictionary | Not Started | 2026-08-23 | — |
 | [US-27](#us-27) | Note when a word is usually written using kana alone | Dictionary | Not Started | 2026-08-24 | — |
@@ -83,6 +82,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | — |
 | [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | — |
 | [US-35](#us-35) | Add a "book reading mode" setting for hiragana-compound recognition | Dictionary | Not Started | 2026-08-24 | — |
+| [US-36](#us-36) | Sentence-case sense-group headers instead of all-caps | Dictionary | Not Started | 2026-08-24 | — |
 
 ### Camera
 
@@ -257,6 +257,17 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 </details>
 
+<a id="us-36"></a>**US-36 — Sentence-case sense-group headers instead of all-caps.** As a learner, I want a sense group's part-of-speech header ([US-21](#us-21)) shown in a natural reading case — each pos tag capitalized on its own, the way Jisho.org shows them (e.g. "Godan verb with 'ru' ending, Transitive verb") — instead of the current all-caps "GODAN VERB WITH 'RU' ENDING, TRANSITIVE VERB", so headers are easier to read at a glance and match the reference style the app is modeled on.
+
+<details>
+<summary>Show details</summary>
+
+- Currently `GroupedMeaningsList` (`ResultsView.swift`) renders `group.pos.joined(separator: ", ")` with `.textCase(.uppercase)`, mirroring the existing "Kanji Breakdown" section caption's style. JMdict's raw pos text itself is inconsistently (mostly lower-)cased (e.g. "transitive verb", "suffix"), so simply dropping the uppercase modifier isn't enough on its own — it would read "transitive verb", not "Transitive verb".
+- Fix is display-only, no data/model change: capitalize just the first letter of each individual pos tag (not the first letter of the whole joined string, since Jisho's own example capitalizes *every* tag, including ones after the first) before joining with ", " — e.g. "suffix, Godan verb with 'ru' ending" → "Suffix, Godan verb with 'ru' ending".
+- *Not started.*
+
+</details>
+
 <a id="us-20"></a>**US-20 — Show vocab tags (part of speech, common, JLPT, WaniKani) in results.** As a learner, I want to see a word's part of speech, whether it's a common word, and (once available) its JLPT/WaniKani level directly on the results screen, so that I get more context about the word without leaving the app.
 
 <details>
@@ -264,16 +275,6 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 
 - `part_of_speech` and `is_common` already exist in the `words` schema (populated from JMdict) but per FR-13 are deliberately not surfaced in the v1 UI — this story is exactly the "later version" FR-13 anticipated.
 - JLPT/WaniKani display depends on [US-17](#us-17) actually having that data available.
-- *Not started.*
-
-</details>
-
-<a id="us-21"></a>**US-21 — Group similar/related dictionary senses instead of one long list.** As a learner, I want related meanings for a word or kanji grouped together (the way Jisho.org visually clusters related senses), instead of a single flat bulleted list, so that I can more quickly tell which meanings are closely related versus genuinely distinct usages.
-
-<details>
-<summary>Show details</summary>
-
-- Would likely require re-examining how `meanings` are stored/parsed from JMdict's `<sense>` groupings (currently flattened into one JSON array per entry in `build_dictionary.py`) to preserve sense-group boundaries.
 - *Not started.*
 
 </details>
@@ -529,7 +530,20 @@ As a learner, when OCR recognizes a lone, isolated *katakana* character with no 
 
 | ID | Story | Type | Status | Date Added | Date Resolved | Version |
 |----|---|---|---|---|---|---|
+| [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v3 |
 | [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Closed | 2026-08-24 | 2026-08-24 | v3 |
+
+<details id="us-21">
+<summary><strong>US-21 — Group similar/related dictionary senses instead of one long list.</strong></summary>
+
+As a learner, I want related meanings for a word or kanji grouped together (the way Jisho.org visually clusters related senses), instead of a single flat bulleted list, so that I can more quickly tell which meanings are closely related versus genuinely distinct usages.
+- **Research: JMdict's real structural signal for a usage-context boundary is a change in a sense's `<pos>` tags.** Confirmed against the real bundled `JMdict_e` and cross-checked against live Jisho.org: 切る's 26 senses split into exactly the 2 groups Jisho shows (23 "Godan verb, transitive verb" senses, then 3 "suffix, Godan verb" senses); 取る's 18 senses all share one pos, so grouping correctly yields a single group (not a regression — still individually numbered). Pos-set equality must be order-insensitive: real entries (シングル, くたくた, ダブル, and others) have two senses whose pos tags are identical as a *set* but appear in a different order, so an ordered/string comparison would wrongly split them.
+- Implemented exactly per that research: `build_dictionary.py`'s `parse_jmdict()` now emits `words.meanings` as a JSON array of `{"pos": [...], "glosses": [...]}` objects (one per JMdict `<sense>`, implementing JMdict's own pos-inheritance rule for a sense with no explicit `<pos>`) instead of a flat gloss list — no schema/column change, just a different JSON shape in the same column. `Models.swift` gained `WordSense`/`SenseGroup` (`SenseGroup.group(_:)` merges consecutive senses whose `pos` sets are equal); `WordEntry.meanings` renamed to `senses: [WordSense]` with a computed `senseGroups`. `ResultsView.swift`'s new `GroupedMeaningsList` replaces the flat `MeaningsList` for words specifically (kanji-level `MeaningsList`/`KanjiEntry.meanings` untouched, since KANJIDIC2 has no sense/pos concept at all): every sense is numbered continuously across all groups starting at 1 (including a genuinely single-sense word, which shows "1." rather than an unlabeled bullet — the user's explicit call, overriding the initial "no number for a single sense" draft), and a group's pos header renders once per group, not repeated per sense.
+- New `SenseGroupingTests.swift` covers the merge logic directly (order-insensitive pos equality, the real 切る/取る shapes, a non-monotonic A/B/A pattern staying 3 groups). Verified against the real bundled dictionary via the Simulator debug-harness pattern: 切る (truncated to its group boundary to avoid needing to scroll a 26-line list on-device) showed the 23/3-sense split with continuous 1-6 numbering across the truncated slice and both correct headers; 取る showed one header with no incorrect splitting across all 18 senses; 犬小屋 (a real single-sense entry) showed "1. kennel; doghouse" under its one header.
+- Follow-up header-casing polish (all-caps → sentence-case-per-tag, matching Jisho more closely) logged separately as [US-36](#us-36), not part of this story's scope.
+- *Closed* by the user on-device.
+
+</details>
 
 <details id="us-34">
 <summary><strong>US-34 — Don't auto-select when only one region is detected.</strong></summary>

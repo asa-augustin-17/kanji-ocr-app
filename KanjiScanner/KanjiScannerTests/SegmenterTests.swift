@@ -34,7 +34,7 @@ final class SegmenterTests: XCTestCase {
 
         XCTAssertEqual(tokens.count, 1)
         XCTAssertEqual(tokens[0].result.word?.surfaceForm, "目")
-        XCTAssertEqual(tokens[0].result.word?.meanings, ["eye"])
+        XCTAssertEqual(tokens[0].result.word?.senses.flatMap(\.glosses), ["eye"])
         XCTAssertEqual(tokens[0].result.kanjiBreakdown.map(\.character), ["目"])
     }
 
@@ -86,7 +86,7 @@ final class SegmenterTests: XCTestCase {
 
         XCTAssertEqual(tokens.count, 1)
         XCTAssertEqual(tokens[0].result.word?.surfaceForm, "コーヒー")
-        XCTAssertEqual(tokens[0].result.word?.meanings, ["coffee"])
+        XCTAssertEqual(tokens[0].result.word?.senses.flatMap(\.glosses), ["coffee"])
     }
 
     func testUnmatchedKatakanaRunProducesNoEntryResult() {
@@ -132,7 +132,7 @@ final class SegmenterTests: XCTestCase {
         XCTAssertEqual(tokens.count, 1)
         XCTAssertEqual(tokens[0].result.word?.surfaceForm, "煙草")
         XCTAssertEqual(tokens[0].result.word?.reading, "タバコ")
-        XCTAssertEqual(tokens[0].result.word?.meanings, ["tobacco", "cigarette"])
+        XCTAssertEqual(tokens[0].result.word?.senses.flatMap(\.glosses), ["tobacco", "cigarette"])
     }
 
     func testKatakanaOnlyEntryTakesPriorityOverReadingFallback() {
@@ -188,7 +188,7 @@ final class SegmenterTests: XCTestCase {
         XCTAssertEqual(tokens[0].result.token, "1匹")
         XCTAssertEqual(tokens[0].result.word?.surfaceForm, "一匹")
         XCTAssertEqual(tokens[0].result.word?.reading, "いっぴき")
-        XCTAssertEqual(tokens[0].result.word?.meanings, ["one (small animal)"])
+        XCTAssertEqual(tokens[0].result.word?.senses.flatMap(\.glosses), ["one (small animal)"])
     }
 
     func testUnmatchedDigitRunProducesNoToken() {
