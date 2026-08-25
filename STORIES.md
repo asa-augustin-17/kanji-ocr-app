@@ -284,6 +284,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 <summary>Show details</summary>
 
 - JMdict itself excludes most proper nouns; this would likely need EDRDG's separate `ENAMDICT`/`JMnedict` name dictionary as an additional data source in the build pipeline.
+- **This scope gap is worse in practice than a clean miss.** Confirmed directly against the real bundled dictionary: scanning ヨハネスブルク (Johannesburg) doesn't just fail to match — the katakana segmenter's longest-match-first algorithm falls back to shorter substrings and finds two real, totally unrelated entries buried inside it (`ネス` → "suffix: -ness"; `ブル` → "bull"/"bulldog"/"bourgeois"/"birr"), so the app confidently shows wrong definitions for fragments of the name rather than a graceful "no dictionary entry found." (`ヨハ` still gets a plain "no entry" box per the existing multi-char unmatched-run rule, and the trailing `ク` gets no box at all per US-33's single-char rule.) Not a bug in the segmentation logic itself — it's doing exactly what it's designed to do — but a real consequence of this story's scope gap worth having on record before ENAMDICT/JMnedict import is picked up.
 - *Not started.*
 
 </details>
