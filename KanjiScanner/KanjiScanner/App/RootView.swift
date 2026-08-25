@@ -41,7 +41,10 @@ struct RootView: View {
                 image: image,
                 regions: regions,
                 onSelect: { result in screen = .results(image: image, regions: regions, result: result) },
-                onRetake: { screen = .camera },
+                onRetake: {
+                    cameraViewModel.resetZoomAndFocus()
+                    screen = .camera
+                },
                 scale: $zoomScale,
                 offset: $zoomOffset
             )
@@ -51,6 +54,7 @@ struct RootView: View {
                 // different detected word/kanji without re-taking the shot.
                 screen = .overlay(image: image, regions: regions)
             } onScanAgain: {
+                cameraViewModel.resetZoomAndFocus()
                 screen = .camera
             }
         }

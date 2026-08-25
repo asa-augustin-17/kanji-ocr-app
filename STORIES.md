@@ -67,7 +67,7 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | ID | Story | Type | Status | Date Added | Version |
 |----|---|---|---|---|---|
 | [US-11](#us-11) | Setting to toggle resume-zoom-on-back behavior on/off | Captured Picture | Not Started | 2026-08-23 | — |
-| [US-12](#us-12) | Pinch-to-zoom the live camera before capturing | Camera | Not Started | 2026-08-23 | — |
+| [US-12](#us-12) | Pinch-to-zoom the live camera before capturing | Camera | Implemented | 2026-08-23 | — |
 | [US-13](#us-13) | Tap to focus the camera before capturing | Camera | Not Started | 2026-08-23 | — |
 | [US-14](#us-14) | Fix the scan-overlay zoom-out "kink" (see [BUG-010](BUGS.md#bug-010)) | Captured Picture | Not Started | 2026-08-23 | — |
 | [US-15](#us-15) | Smooth, decaying scroll deceleration on the captured photo | Captured Picture | Not Started | 2026-08-23 | — |
@@ -91,7 +91,8 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 <summary>Show details</summary>
 
 - Distinct from [US-9](#us-9) (zooming the *captured photo* after the fact) — this is zooming the *live viewfinder*, changing what's actually captured.
-- *Not started.*
+- **Implemented and combined with [US-13](#us-13)'s implementation pass** (not their acceptance criteria, which don't overlap, but their implementation surface — both needed a new stored `AVCaptureDevice` reference `CameraViewModel` didn't have before, both attach gestures to the same preview view, and both needed the same reset-on-Retake fix). Landed as its own commit within that pass. `CameraViewModel` gained a stored `device` property (previously only a local variable inside `configureSession()`), `setZoomFactor(_:)` (fire-and-forget `sessionQueue.async`, mirroring the existing `stop()` method's pattern — clamps against the device's live zoom range, capped at 6 to match `ScanOverlayView.maxZoom` for a consistent feel with the already-shipped captured-photo zoom), and `resetZoomAndFocus()` (called from `RootView.swift`'s `onRetake`/`onScanAgain`, since `device` is a persistent, never-recreated object — same lifetime pattern that caused BUG-005 — so a non-1x zoom would otherwise silently carry into the next capture). `CameraView.swift` wraps the preview in a `GeometryReader` (with `.ignoresSafeArea()` applied from *outside* it, copying `ScanOverlayView`'s exact placement — applying it to the inner view instead would have left `proxy.size` reflecting the safe-area-inset frame while the rendered layer stayed full-bleed, a real coordinate mismatch relevant to [US-13](#us-13)'s tap point too) and adds a `MagnifyGesture`, reusing the `committedZoomFactor`-at-gesture-boundary bookkeeping pattern from `ScanOverlayView` (not its offset/anchor math, which is specific to panning a rendered `CGImage` and doesn't apply to a `videoZoomFactor`-driven live zoom).
+- Verified: `xcodebuild clean build`/`test` pass; on the Simulator (no real camera hardware, confirmed by BUG-001, so the zoom *effect* itself can't be exercised there), tapping and two-finger pinching the live preview with `device == nil` doesn't crash the app. Zoom's actual on-device behavior (smoothness, clamping, whether a zoomed capture reflects the zoomed framing) requires the physical iPhone and is *awaiting the user's on-device confirmation before closing*.
 
 </details>
 
