@@ -36,15 +36,6 @@ final class CameraViewModel: NSObject, ObservableObject {
     private var captureContinuation: CheckedContinuation<CGImage, Error>?
     private var isConfigured = false
 
-    /// Stored so zoom/focus/exposure calls (US-12, US-13) have a device to
-    /// configure. Only ever assigned once, in `configureSession()`.
-    private var device: AVCaptureDevice?
-
-    /// Matches `ScanOverlayView.maxZoom` (US-9's captured-photo zoom) so the
-    /// live viewfinder and the post-capture zoom feel consistent, rather than
-    /// exposing a device's full (sometimes much larger) digital zoom range.
-    private static let maxZoomFactor: CGFloat = 6
-
     /// Computes the correct sensor-to-interface rotation angle for this
     /// specific device/camera position — replaces manually guessing a
     /// rotation constant, which doesn't account for how the back camera's
@@ -94,74 +85,6 @@ final class CameraViewModel: NSObject, ObservableObject {
         configureAndStartIfNeeded()
     }
 
-    /// Pinch-to-zoom the live viewfinder (US-12). `factor` is the desired
-    /// absolute zoom (not a delta) - the caller (a `MagnifyGesture`) is
-    /// responsible for combining its own committed zoom with the gesture's
-    /// relative magnification before calling this. Clamped against the
-    /// device's live zoom range, not a cached copy, since this can be called
-    /// at gesture-tick frequency. Fire-and-forget like `stop()` above - there's
-    /// no result to hand back, the user sees the effect live via the preview.
-    func setZoomFactor(_ factor: CGFloat) {
-        sessionQueue.async { [device] in
-            guard let device else { return }
-            let clamped = min(
-                max(factor, device.minAvailableVideoZoomFactor),
-                min(device.maxAvailableVideoZoomFactor, Self.maxZoomFactor)
-            )
-            guard (try? device.lockForConfiguration()) != nil else { return }
-            device.videoZoomFactor = clamped
-            device.unlockForConfiguration()
-        }
-    }
-
-    /// Tap-to-focus/expose the live viewfinder (US-13). `point` is in
-    /// `previewLayer`'s own coordinate space - the conversion to the
-    /// normalized device-point space `focusPointOfInterest`/
-    /// `exposurePointOfInterest` expect happens here, so callers don't need
-    /// to know anything about AVFoundation's coordinate system. Sets focus
-    /// and exposure independently (a device could support one without the
-    /// other) as a single-shot adjustment that locks once reached, mirroring
-    /// system Camera.app's tap-to-focus/expose behavior - continuous
-    /// autofocus/autoexposure would keep hunting, which doesn't fit a
-    /// deliberate "focus here" tap on a held-steady page.
-    func focus(atLayerPoint point: CGPoint) {
-        let devicePoint = previewLayer.captureDevicePointConverted(fromLayerPoint: point)
-        sessionQueue.async { [device] in
-            guard let device else { return }
-            guard (try? device.lockForConfiguration()) != nil else { return }
-            if device.isFocusPointOfInterestSupported, device.isFocusModeSupported(.autoFocus) {
-                device.focusPointOfInterest = devicePoint
-                device.focusMode = .autoFocus
-            }
-            if device.isExposurePointOfInterestSupported, device.isExposureModeSupported(.autoExpose) {
-                device.exposurePointOfInterest = devicePoint
-                device.exposureMode = .autoExpose
-            }
-            device.unlockForConfiguration()
-        }
-    }
-
-    /// Resets zoom/focus/exposure to their defaults - called when returning
-    /// to a fresh camera screen (Retake/Scan Again) so a locked focus point
-    /// or non-1x zoom from the previous shot doesn't silently carry over.
-    /// `device` is a persistent, never-recreated object for the life of this
-    /// view model (same lifetime as `previewLayer`, see its doc comment), so
-    /// nothing else resets this state automatically.
-    func resetZoomAndFocus() {
-        sessionQueue.async { [device] in
-            guard let device else { return }
-            guard (try? device.lockForConfiguration()) != nil else { return }
-            device.videoZoomFactor = 1
-            if device.isFocusModeSupported(.continuousAutoFocus) {
-                device.focusMode = .continuousAutoFocus
-            }
-            if device.isExposureModeSupported(.continuousAutoExposure) {
-                device.exposureMode = .continuousAutoExposure
-            }
-            device.unlockForConfiguration()
-        }
-    }
-
     private func configureAndStartIfNeeded() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
@@ -181,11 +104,12 @@ final class CameraViewModel: NSObject, ObservableObject {
         session.beginConfiguration()
         session.sessionPreset = .photo
 
-        if let captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-           let input = try? AVCaptureDeviceInput(device: captureDevice),
+        var configuredDevice: AVCaptureDevice?
+        if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+           let input = try? AVCaptureDeviceInput(device: device),
            session.canAddInput(input) {
             session.addInput(input)
-            device = captureDevice
+            configuredDevice = device
         }
 
         if session.canAddOutput(photoOutput) {
@@ -195,8 +119,8 @@ final class CameraViewModel: NSObject, ObservableObject {
         session.commitConfiguration()
         isConfigured = true
 
-        guard let device else { return }
-        let coordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: previewLayer)
+        guard let configuredDevice else { return }
+        let coordinator = AVCaptureDevice.RotationCoordinator(device: configuredDevice, previewLayer: previewLayer)
         rotationCoordinator = coordinator
 
         if let connection = photoOutput.connection(with: .video),

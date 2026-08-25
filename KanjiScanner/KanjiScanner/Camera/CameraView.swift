@@ -45,26 +45,12 @@ struct CameraView: View {
     @State private var isCapturing = false
     @State private var captureError: String?
 
-    // Pinch-to-zoom bookkeeping (US-12), mirroring ScanOverlayView's
-    // committedScale pattern so successive pinches compose correctly
-    // instead of jumping (the exact bug BUG-006 fixed there).
-    @State private var committedZoomFactor: CGFloat = 1
-    /// Set true while a real pinch is in progress, so a tap gesture (US-13)
-    /// added on top of this same preview doesn't spuriously fire at a
-    /// pinch's end location - same pattern BUG-008/009 established in
-    /// ScanOverlayView.
-    @State private var isInteracting = false
-
     var body: some View {
         ZStack {
             switch viewModel.permissionStatus {
             case .authorized:
-                GeometryReader { _ in
-                    CameraPreview(previewLayer: viewModel.previewLayer)
-                        .contentShape(Rectangle())
-                        .simultaneousGesture(magnifyGesture)
-                }
-                .ignoresSafeArea()
+                CameraPreview(previewLayer: viewModel.previewLayer)
+                    .ignoresSafeArea()
                 captureControls
             case .denied:
                 PermissionDeniedView()
@@ -105,35 +91,6 @@ struct CameraView: View {
             } catch {
                 captureError = error.localizedDescription
             }
-        }
-    }
-
-    /// Live-camera pinch-to-zoom (US-12). Unlike ScanOverlayView's version
-    /// (which zooms an already-rendered `CGImage` via `scaleEffect`/`offset`),
-    /// there's no anchor/offset math needed here - `videoZoomFactor` is
-    /// inherently center-fixed at the sensor level, and AVFoundation clamps
-    /// it against the device's own zoom range itself. `committedZoomFactor`
-    /// still needs the same read/write-at-gesture-boundary bookkeeping so
-    /// successive pinches compose smoothly rather than resetting each time.
-    private var magnifyGesture: some Gesture {
-        MagnifyGesture()
-            .onChanged { value in
-                isInteracting = true
-                viewModel.setZoomFactor(committedZoomFactor * value.magnification)
-            }
-            .onEnded { value in
-                committedZoomFactor = max(1, committedZoomFactor * value.magnification)
-                scheduleInteractionReset()
-            }
-    }
-
-    /// Clears `isInteracting` a beat after the gesture ends rather than
-    /// synchronously, mirroring ScanOverlayView's identical `isInteracting`
-    /// pattern (BUG-008/009) - avoids a race where a tap gesture resolving at
-    /// the same touch-up moment could still slip through.
-    private func scheduleInteractionReset() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            isInteracting = false
         }
     }
 }
