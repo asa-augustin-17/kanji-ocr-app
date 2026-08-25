@@ -10,6 +10,7 @@
 		01ECE8991836657D2F54CCF6 /* Segmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F29F4E37EFBAA5F2B86F105 /* Segmenter.swift */; };
 		08EB1FE5D11344AD6EF36FF3 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */; };
 		2A1F7BAC92A59CE63D7AB541 /* PermissionDeniedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */; };
+		392A05640C9C025498D1F18F /* PosDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564EAC93CB764C7400C9E7B6 /* PosDisplayTests.swift */; };
 		393CD31DB6618C11B2CEB259 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */; };
 		3E227380E69664D5034BC414 /* SenseGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */; };
 		750E2DDED34E69E39D162107 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7169AF8DF1832B6C827BC53 /* Models.swift */; };
@@ -50,6 +51,7 @@
 		42C7E0169556D3147BC8A513 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		45D88B319AEB9DA143D1CF2E /* DictionaryDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDatabase.swift; sourceTree = "<group>"; };
 		54F859F9E9335A74404A0112 /* KanjiScannerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KanjiScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		564EAC93CB764C7400C9E7B6 /* PosDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosDisplayTests.swift; sourceTree = "<group>"; };
 		7ADB20D9F21C479878FFC009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8E6C5AFA0C39B35F111B767E /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDatabaseTests.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */,
+				564EAC93CB764C7400C9E7B6 /* PosDisplayTests.swift */,
 				1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */,
 				412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */,
 				0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */,
@@ -319,6 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2858D11DB24AD8A55BF263F /* DictionaryDatabaseTests.swift in Sources */,
+				392A05640C9C025498D1F18F /* PosDisplayTests.swift in Sources */,
 				BEB42108C62C54FDB69B2E02 /* SegmenterTests.swift in Sources */,
 				3E227380E69664D5034BC414 /* SenseGroupingTests.swift in Sources */,
 				C66B59A1DEF54DF36B4433BB /* TestDictionaryFactory.swift in Sources */,

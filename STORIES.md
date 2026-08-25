@@ -82,7 +82,6 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 | [US-30](#us-30) | Recognize conjugated verbs/adjectives, resolve to dictionary form | Dictionary | Not Started | 2026-08-24 | — |
 | [US-32](#us-32) | Recognize hiragana-only words/expressions | Dictionary | Not Started | 2026-08-24 | — |
 | [US-35](#us-35) | Add a "book reading mode" setting for hiragana-compound recognition | Dictionary | Not Started | 2026-08-24 | — |
-| [US-36](#us-36) | Sentence-case sense-group headers instead of all-caps | Dictionary | Not Started | 2026-08-24 | — |
 
 ### Camera
 
@@ -253,17 +252,6 @@ Requested by the user on 2026-08-23 but explicitly scoped as future work, not pa
 - Directly follows from [US-32](#us-32)'s descoping: the underlying matching approach [US-32](#us-32) already researched and planned (hiragana runs, length ≥ 3 floor, no fallback token) doesn't need to be redesigned — it needs to be **opt-in** rather than always-on, scoped to a second, distinct use case (continuous reading) rather than the app's primary one (quick lookups from photos of text encountered in the wild).
 - Once gated behind an explicit "I'm reading a book" mode, it may also be worth reconsidering whether the length floor itself should relax further in that mode specifically (e.g. even 1-2 character particles could be legitimately useful mid-book, where they wouldn't be for a quick sign scan) — not decided, worth its own pass when this is picked up.
 - The app currently has **no settings/preferences screen at all** — this would be the **second** story (after **[US-11](#us-11)**) to need one, strengthening the case for building shared settings infrastructure once rather than bespoke per-feature toggles.
-- *Not started.*
-
-</details>
-
-<a id="us-36"></a>**US-36 — Sentence-case sense-group headers instead of all-caps.** As a learner, I want a sense group's part-of-speech header ([US-21](#us-21)) shown in a natural reading case — each pos tag capitalized on its own, the way Jisho.org shows them (e.g. "Godan verb with 'ru' ending, Transitive verb") — instead of the current all-caps "GODAN VERB WITH 'RU' ENDING, TRANSITIVE VERB", so headers are easier to read at a glance and match the reference style the app is modeled on.
-
-<details>
-<summary>Show details</summary>
-
-- Currently `GroupedMeaningsList` (`ResultsView.swift`) renders `group.pos.joined(separator: ", ")` with `.textCase(.uppercase)`, mirroring the existing "Kanji Breakdown" section caption's style. JMdict's raw pos text itself is inconsistently (mostly lower-)cased (e.g. "transitive verb", "suffix"), so simply dropping the uppercase modifier isn't enough on its own — it would read "transitive verb", not "Transitive verb".
-- Fix is display-only, no data/model change: capitalize just the first letter of each individual pos tag (not the first letter of the whole joined string, since Jisho's own example capitalizes *every* tag, including ones after the first) before joining with ", " — e.g. "suffix, Godan verb with 'ru' ending" → "Suffix, Godan verb with 'ru' ending".
 - *Not started.*
 
 </details>
@@ -532,6 +520,7 @@ As a learner, when OCR recognizes a lone, isolated *katakana* character with no 
 |----|---|---|---|---|---|---|
 | [US-21](#us-21) | Group similar/related dictionary senses instead of one long list | Dictionary | Closed | 2026-08-23 | 2026-08-24 | v3 |
 | [US-34](#us-34) | Don't auto-select when only one region is detected | Captured Picture | Closed | 2026-08-24 | 2026-08-24 | v3 |
+| [US-36](#us-36) | Sentence-case sense-group headers, drop/rename redundant pos wording | Dictionary | Closed | 2026-08-24 | 2026-08-24 | v3 |
 
 <details id="us-21">
 <summary><strong>US-21 — Group similar/related dictionary senses instead of one long list.</strong></summary>
@@ -552,6 +541,18 @@ As a learner, when a scan detects only one region, I want the captured photo to 
 - **This also reverses an explicit v1 acceptance criterion.** [US-2](#us-2)'s original AC states: "Tapping a region selects it for lookup; a single detected region auto-selects." That auto-select behavior is exactly what's now being asked to remove, based on actually trying it on-device — this was flagged in STORIES.md's own "v1 closure review" as a state that had *never been explicitly observed on-device* despite the code looking correct; now that it has been, the user's assessment is that it's the wrong behavior in practice (it removes the chance to double-check the detected region, and breaks the consistent "photo → tap → results" flow the multi-region case always has).
 - Implemented by removing the single line in `ScanOverlayView.swift`'s `.onAppear` that auto-selected the sole region (`if regions.count == 1, let only = regions.first { onSelect(only.result) }`) — nothing else changed.
 - Verified via the Simulator debug-harness pattern (a single-region `.overlay` screen built directly in `RootView.swift`, reverted afterward via `git checkout`): the scan overlay now renders the one detected region (目) and waits for a tap instead of jumping straight to results; tapping the box still correctly opens 目's results. Clean `xcodebuild test` passes (25/25).
+- *Closed* by the user on-device.
+
+</details>
+
+<details id="us-36">
+<summary><strong>US-36 — Sentence-case sense-group headers, and drop/rename redundant part-of-speech wording.</strong></summary>
+
+As a learner, I want a sense group's part-of-speech header ([US-21](#us-21)) shown in a natural reading case — each pos tag capitalized on its own, the way Jisho.org shows them (e.g. "Godan verb with 'ru' ending, Transitive verb") — instead of the current all-caps "GODAN VERB WITH 'RU' ENDING, TRANSITIVE VERB". Caught during testing: the single most common header, "NOUN (COMMON) (FUTSUUMEISHI)", is needlessly long — "futsuumeishi" is just the romaji restating "noun (common)" — and real Jisho.org just shows "Noun".
+- **Research: queried the real bundled dictionary for every distinct pos tag** (82 total appear across all senses). `noun (common) (futsuumeishi)` alone accounts for 257,138 of the roughly 380,000 total pos-tag occurrences across the whole dictionary — over two-thirds — so it's by far the highest-leverage single fix. A handful of others follow a similar "English term, then the same term again in Japanese romaji" shape: `adverb (fukushi)`, `adjective (keiyoushi)` (+ its `- yoi/ii class` variant), `adjectival nouns or quasi-adjectives (keiyodoshi)`, `interjection (kandoushi)`, `pre-noun adjectival (rentaishi)`.
+- **Verified against real Jisho.org entries that this is NOT a blanket "always strip the romaji" rule** — an initial guess that it was turned out wrong on inspection. Confirmed directly (fetched real entries: 犬小屋, すぐ/直ぐ, ああ, 良い, 好き): Jisho drops the parenthetical entirely only for the noun tag (`noun (common) (futsuumeishi)` → **"Noun"**, dropping "(common)" too) — but *keeps* the Japanese term for adverb (`"Adverb (fukushi)"`) and renames-but-keeps it for the two adjective classes (`"I-adjective (keiyoushi)"`, `"Na-adjective (keiyodoshi)"`, using the standard learner terms instead of JMdict's generic "adjective"/"adjectival noun" wording). Interjection and pre-noun adjectival weren't directly verified — by the observed pattern they're expected to stay unchanged (parenthetical kept), but that's inferred, not confirmed.
+- Implemented exactly per the approved scope: new `PosDisplay` enum (`ResultsView.swift`) maps a raw pos tag to its display form — a `[String: String]` override table for the four evidence-verified special cases (`noun (common) (futsuumeishi)` → `Noun`; `adjective (keiyoushi)` → `I-adjective (keiyoushi)`; its `- yoi/ii class` variant renamed the same way; `adjectival nouns or quasi-adjectives (keiyodoshi)` → `Na-adjective (keiyodoshi)`), falling back to capitalizing just the tag's own first letter (skipping any leading punctuation, e.g. `'taru' adjective` → `'Taru' adjective`) for everything else. `GroupedMeaningsList` now maps each tag in a group through `PosDisplay.label(for:)` before joining with `", "`, and the `.textCase(.uppercase)` modifier is gone.
+- New `PosDisplayTests.swift` covers all four overrides plus the default sentence-casing path (including the leading-punctuation case) — pure logic, no DB needed. Verified against the real bundled dictionary via the Simulator debug-harness pattern: 犬小屋 now shows exactly "Noun"; 良い shows "I-adjective (keiyoushi)" for its main senses and "Suffix, I-adjective (keiyoushi)" for its trailing suffix sense (confirming the override and default-casing paths combine correctly within one header); 切る (whose tags are untouched by the override table) still renders identically to before, confirming no regression.
 - *Closed* by the user on-device.
 
 </details>

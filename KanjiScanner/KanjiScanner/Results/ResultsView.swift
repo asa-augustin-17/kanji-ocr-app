@@ -304,9 +304,8 @@ private struct GroupedMeaningsList: View {
             ForEach(Array(groups.enumerated()), id: \.offset) { groupIndex, group in
                 VStack(alignment: .leading, spacing: 4) {
                     if !group.pos.isEmpty {
-                        Text(group.pos.joined(separator: ", "))
+                        Text(group.pos.map(PosDisplay.label).joined(separator: ", "))
                             .font(.caption)
-                            .textCase(.uppercase)
                             .foregroundStyle(.secondary)
                     }
                     ForEach(Array(group.senses.enumerated()), id: \.offset) { senseIndex, sense in
@@ -320,5 +319,38 @@ private struct GroupedMeaningsList: View {
 
     private func senseNumber(groupIndex: Int, senseIndex: Int) -> Int {
         groups[..<groupIndex].reduce(0) { $0 + $1.senses.count } + senseIndex + 1
+    }
+}
+
+/// Maps a raw JMdict pos tag to its display form (US-36). Default is just
+/// capitalizing the tag's own first letter - JMdict's raw text is otherwise
+/// already reasonably concise. A few tags get an explicit override instead:
+/// verified against real Jisho.org entries that it does NOT blanket-strip a
+/// tag's bracketed Japanese romaji term (it keeps "(fukushi)" for adverb,
+/// "(keiyoushi)" for i-adjective, etc.) - the *only* tag it fully collapses
+/// is the noun one, and it also drops that tag's "(common)" qualifier, not
+/// just the romaji part. The two adjective-class tags get renamed to the
+/// standard learner terms (I-adjective/Na-adjective) rather than JMdict's
+/// generic "adjective"/"adjectival noun" wording, matching Jisho, but keep
+/// their Japanese term. Every other tag (including adverb, interjection,
+/// pre-noun adjectival, and JMdict's ~76 verb-conjugation-class tags) is
+/// left as JMdict's own wording, sentence-cased only - not guessed at
+/// beyond what was actually verified.
+enum PosDisplay {
+    private static let overrides: [String: String] = [
+        "noun (common) (futsuumeishi)": "Noun",
+        "adjective (keiyoushi)": "I-adjective (keiyoushi)",
+        "adjective (keiyoushi) - yoi/ii class": "I-adjective (keiyoushi) - yoi/ii class",
+        "adjectival nouns or quasi-adjectives (keiyodoshi)": "Na-adjective (keiyodoshi)",
+    ]
+
+    static func label(for tag: String) -> String {
+        if let override = overrides[tag] {
+            return override
+        }
+        guard let firstLetterIndex = tag.firstIndex(where: { $0.isLetter }) else { return tag }
+        var result = tag
+        result.replaceSubrange(firstLetterIndex...firstLetterIndex, with: tag[firstLetterIndex].uppercased())
+        return result
     }
 }
