@@ -21,15 +21,20 @@ enum TokenBoxBuilder {
         for line in lines {
             let tokens = Segmenter.segment(line.text, using: database)
             for token in tokens {
-                guard let rectObservation = try? line.recognizedText.boundingBox(for: token.range) else { continue }
-                regions.append(ScanRegion(normalizedRect: axisAlignedRect(for: rectObservation), result: token.result))
+                guard let rect = try? line.recognizedText.regionBoundingBox(for: token.range) else { continue }
+                regions.append(ScanRegion(normalizedRect: rect, result: token.result))
             }
         }
 
         return regions
     }
 
-    private static func axisAlignedRect(for observation: VNRectangleObservation) -> CGRect {
+    /// Flattens a Vision quad (four independently-corner-positioned points,
+    /// meant for perspective-distorted detections) to a plain axis-aligned
+    /// rect - shared by `VNRecognizedText`'s `RecognizedTextSource`
+    /// conformance above, since nothing downstream (`ScanRegion`, the scan
+    /// overlay's tap targets) needs the quad shape itself.
+    static func axisAlignedRect(for observation: VNRectangleObservation) -> CGRect {
         let points = [observation.topLeft, observation.topRight, observation.bottomLeft, observation.bottomRight]
         let xs = points.map(\.x)
         let ys = points.map(\.y)
