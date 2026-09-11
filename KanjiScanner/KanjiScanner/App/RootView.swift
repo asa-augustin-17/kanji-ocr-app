@@ -18,7 +18,7 @@ struct RootView: View {
     @State private var zoomScale: CGFloat = 1
     @State private var zoomOffset: CGSize = .zero
 
-    private let textRecognizer = OrientationAwareRecognizer()
+    private let textRecognizer = TextRecognizer()
     private let database = DictionaryDatabase.shared
 
     var body: some View {
