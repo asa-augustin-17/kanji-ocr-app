@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		01ECE8991836657D2F54CCF6 /* Segmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F29F4E37EFBAA5F2B86F105 /* Segmenter.swift */; };
 		08EB1FE5D11344AD6EF36FF3 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */; };
+		2059381015E1897B3BD852DD /* VerticalTextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5CBEEB6D1FC81EBE1B6E10 /* VerticalTextRecognizer.swift */; };
 		2A1F7BAC92A59CE63D7AB541 /* PermissionDeniedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */; };
 		392A05640C9C025498D1F18F /* PosDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564EAC93CB764C7400C9E7B6 /* PosDisplayTests.swift */; };
 		393CD31DB6618C11B2CEB259 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */; };
 		3E227380E69664D5034BC414 /* SenseGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */; };
+		4898349AAE082AF5ACED9570 /* OrientationAwareRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78143D9F4F082B453F1BA48 /* OrientationAwareRecognizer.swift */; };
 		750E2DDED34E69E39D162107 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7169AF8DF1832B6C827BC53 /* Models.swift */; };
 		761066107619107F25FCD7BB /* TextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */; };
 		78934D77BB88DE03C87B87AF /* TokenBoxBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */; };
@@ -23,6 +25,8 @@
 		C01B92AF60F4FA2067DB5808 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = B28E88076FAC7B4AC27F9E7E /* GRDB */; };
 		C4C43D9E04AEC0355A1AADE8 /* kanji_scanner.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = E394D704EF5228328C4C9CC2 /* kanji_scanner.sqlite */; };
 		C66B59A1DEF54DF36B4433BB /* TestDictionaryFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */; };
+		CF126E817614680F2B1ADB61 /* OrientationAwareRecognizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095BF59FFFDB729E49EA1F7 /* OrientationAwareRecognizerTests.swift */; };
+		D06BB755ABB90B13D6970A18 /* VerticalTextRecognizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15255CAD37D4A6330A80E3C6 /* VerticalTextRecognizerTests.swift */; };
 		D5FA30D2A64F3CB3D4FEFBC6 /* DictionaryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45D88B319AEB9DA143D1CF2E /* DictionaryDatabase.swift */; };
 		E2858D11DB24AD8A55BF263F /* DictionaryDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */; };
 		E32D7E55A542DBB32D37DE91 /* NoMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA12BACDE9A854F802AF30A7 /* NoMatchView.swift */; };
@@ -44,9 +48,12 @@
 /* Begin PBXFileReference section */
 		0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDictionaryFactory.swift; sourceTree = "<group>"; };
 		0F29F4E37EFBAA5F2B86F105 /* Segmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmenter.swift; sourceTree = "<group>"; };
+		1095BF59FFFDB729E49EA1F7 /* OrientationAwareRecognizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrientationAwareRecognizerTests.swift; sourceTree = "<group>"; };
+		15255CAD37D4A6330A80E3C6 /* VerticalTextRecognizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextRecognizerTests.swift; sourceTree = "<group>"; };
 		1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmenterTests.swift; sourceTree = "<group>"; };
 		157D0EF68C08D724061A47BE /* KanjiScannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiScannerApp.swift; sourceTree = "<group>"; };
 		2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenBoxBuilder.swift; sourceTree = "<group>"; };
+		3E5CBEEB6D1FC81EBE1B6E10 /* VerticalTextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextRecognizer.swift; sourceTree = "<group>"; };
 		412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenseGroupingTests.swift; sourceTree = "<group>"; };
 		42C7E0169556D3147BC8A513 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		45D88B319AEB9DA143D1CF2E /* DictionaryDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDatabase.swift; sourceTree = "<group>"; };
@@ -58,6 +65,7 @@
 		A7169AF8DF1832B6C827BC53 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		BC4F04992C727363A23DB12D /* KanjiScanner.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = KanjiScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C78143D9F4F082B453F1BA48 /* OrientationAwareRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrientationAwareRecognizer.swift; sourceTree = "<group>"; };
 		D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlayView.swift; sourceTree = "<group>"; };
 		E0343FD23611274B4601967E /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E394D704EF5228328C4C9CC2 /* kanji_scanner.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = kanji_scanner.sqlite; sourceTree = "<group>"; };
@@ -134,10 +142,12 @@
 			isa = PBXGroup;
 			children = (
 				91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */,
+				1095BF59FFFDB729E49EA1F7 /* OrientationAwareRecognizerTests.swift */,
 				564EAC93CB764C7400C9E7B6 /* PosDisplayTests.swift */,
 				1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */,
 				412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */,
 				0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */,
+				15255CAD37D4A6330A80E3C6 /* VerticalTextRecognizerTests.swift */,
 			);
 			path = KanjiScannerTests;
 			sourceTree = "<group>";
@@ -171,8 +181,10 @@
 		B7474F00175BF9863F998682 /* OCR */ = {
 			isa = PBXGroup;
 			children = (
+				C78143D9F4F082B453F1BA48 /* OrientationAwareRecognizer.swift */,
 				F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */,
 				2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */,
+				3E5CBEEB6D1FC81EBE1B6E10 /* VerticalTextRecognizer.swift */,
 			);
 			path = OCR;
 			sourceTree = "<group>";
@@ -307,6 +319,7 @@
 				AEC3F94CDCF6693D8C7C78A3 /* KanjiScannerApp.swift in Sources */,
 				750E2DDED34E69E39D162107 /* Models.swift in Sources */,
 				E32D7E55A542DBB32D37DE91 /* NoMatchView.swift in Sources */,
+				4898349AAE082AF5ACED9570 /* OrientationAwareRecognizer.swift in Sources */,
 				2A1F7BAC92A59CE63D7AB541 /* PermissionDeniedView.swift in Sources */,
 				7AA13CAB24B35AB3ADB43174 /* ResultsView.swift in Sources */,
 				862306F61243A6927DC8B5DC /* RootView.swift in Sources */,
@@ -314,6 +327,7 @@
 				01ECE8991836657D2F54CCF6 /* Segmenter.swift in Sources */,
 				761066107619107F25FCD7BB /* TextRecognizer.swift in Sources */,
 				78934D77BB88DE03C87B87AF /* TokenBoxBuilder.swift in Sources */,
+				2059381015E1897B3BD852DD /* VerticalTextRecognizer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,10 +336,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2858D11DB24AD8A55BF263F /* DictionaryDatabaseTests.swift in Sources */,
+				CF126E817614680F2B1ADB61 /* OrientationAwareRecognizerTests.swift in Sources */,
 				392A05640C9C025498D1F18F /* PosDisplayTests.swift in Sources */,
 				BEB42108C62C54FDB69B2E02 /* SegmenterTests.swift in Sources */,
 				3E227380E69664D5034BC414 /* SenseGroupingTests.swift in Sources */,
 				C66B59A1DEF54DF36B4433BB /* TestDictionaryFactory.swift in Sources */,
+				D06BB755ABB90B13D6970A18 /* VerticalTextRecognizerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
