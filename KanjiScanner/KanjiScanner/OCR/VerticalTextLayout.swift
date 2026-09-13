@@ -44,6 +44,28 @@ enum VerticalTextLayout {
         return columns
     }
 
+    /// Forces `image` into a fully-realized bitmap, copying it through a
+    /// plain `CGContext` round-trip. Confirmed necessary the hard way: a
+    /// `CGImage` straight out of `CGImageSourceCreateThumbnailAtIndex` can be
+    /// backed by a lazy/tiled data provider that doesn't fully decode under
+    /// `cropping(to:)` in every environment - cropping such an image and
+    /// reading it back produced valid pixels only near row 0 and zeros for
+    /// everything else when run in the iOS Simulator against a real photo,
+    /// despite the exact same code working fine in a standalone macOS
+    /// process. Call this once on the page image before cropping anything
+    /// out of it; nothing downstream needs to be defensive about it again,
+    /// since every other CGImage in this pipeline already comes from a
+    /// `CGContext.makeImage()` call, not a lazy decoder.
+    static func materialized(_ image: CGImage) -> CGImage? {
+        guard let context = CGContext(
+            data: nil, width: image.width, height: image.height, bitsPerComponent: 8,
+            bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        return context.makeImage()
+    }
+
     /// Rotates `image` 90 degrees. `clockwise` controls which edge becomes
     /// which: a vertical column reads top-to-bottom, and the recognizer
     /// downstream reads left-to-right, so whichever direction maps "top" to
@@ -53,14 +75,25 @@ enum VerticalTextLayout {
     static func rotated90(_ image: CGImage, clockwise: Bool) -> CGImage? {
         let w = image.width
         let h = image.height
+        // Deliberately normalized to a fixed, known-good color space/pixel
+        // format rather than inheriting the source image's own - a real
+        // photo's color space (e.g. a wide-gamut/HEIC-derived profile) isn't
+        // guaranteed to round-trip cleanly through a freshly created
+        // CGContext on every platform. Confirmed the hard way: inheriting
+        // `image.colorSpace`/`image.bitmapInfo` rendered as a mostly-black
+        // image when run in the iOS Simulator against a real photo, despite
+        // working fine in a standalone macOS scratchpad test against the
+        // same file - this pipeline doesn't need to preserve the original
+        // color profile anyway, just approximately correct RGB for the
+        // recognizer.
         guard let context = CGContext(
             data: nil,
             width: h,
             height: w,
             bitsPerComponent: 8,
             bytesPerRow: 0,
-            space: image.colorSpace ?? CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: image.bitmapInfo.rawValue
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         ) else { return nil }
 
         context.translateBy(x: CGFloat(h) / 2, y: CGFloat(w) / 2)

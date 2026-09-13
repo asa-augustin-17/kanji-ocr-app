@@ -28,7 +28,12 @@ final class VerticalTextRecognizer {
         }
     }
 
-    func recognizeText(in image: CGImage) async throws -> [RecognizedLine] {
+    func recognizeText(in rawImage: CGImage) async throws -> [RecognizedLine] {
+        // See `VerticalTextLayout.materialized`'s doc comment: cropping an
+        // un-materialized image (as a captured photo's CGImage may be) can
+        // silently produce zeroed-out data past the first portion of the
+        // crop - confirmed against a real photo in the iOS Simulator.
+        guard let image = VerticalTextLayout.materialized(rawImage) else { return [] }
         guard let pageBuffer = GrayscaleBuffer(image: image) else { return [] }
         let columns = VerticalTextLayout.detectColumns(in: pageBuffer)
         guard !columns.isEmpty else { return [] }
