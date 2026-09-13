@@ -12,7 +12,9 @@
 		2A1F7BAC92A59CE63D7AB541 /* PermissionDeniedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */; };
 		392A05640C9C025498D1F18F /* PosDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564EAC93CB764C7400C9E7B6 /* PosDisplayTests.swift */; };
 		393CD31DB6618C11B2CEB259 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D861D7504506A40D2052F7D9 /* ScanOverlayView.swift */; };
+		3DF3701A3F6F4893A7DF09FA /* VerticalTextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE25F4E33DA8848552018E97 /* VerticalTextLayout.swift */; };
 		3E227380E69664D5034BC414 /* SenseGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */; };
+		47BF52AEE0083C462B27D618 /* VerticalTextLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002F5F2B466B34E2E0018E4 /* VerticalTextLayoutTests.swift */; };
 		750E2DDED34E69E39D162107 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7169AF8DF1832B6C827BC53 /* Models.swift */; };
 		761066107619107F25FCD7BB /* TextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */; };
 		78934D77BB88DE03C87B87AF /* TokenBoxBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */; };
@@ -62,6 +64,8 @@
 		E0343FD23611274B4601967E /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E394D704EF5228328C4C9CC2 /* kanji_scanner.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = kanji_scanner.sqlite; sourceTree = "<group>"; };
 		E5E9E5ADAA28DF77EB0F1252 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		EE25F4E33DA8848552018E97 /* VerticalTextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextLayout.swift; sourceTree = "<group>"; };
+		F002F5F2B466B34E2E0018E4 /* VerticalTextLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextLayoutTests.swift; sourceTree = "<group>"; };
 		F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRecognizer.swift; sourceTree = "<group>"; };
 		FA12BACDE9A854F802AF30A7 /* NoMatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoMatchView.swift; sourceTree = "<group>"; };
 		FE563E131663C4942EBEE337 /* PermissionDeniedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionDeniedView.swift; sourceTree = "<group>"; };
@@ -138,6 +142,7 @@
 				1565445426E41C68AC1AE1A6 /* SegmenterTests.swift */,
 				412DCF162CABB0D4DD23DC6C /* SenseGroupingTests.swift */,
 				0E6957BE2BCFA71D85574CF5 /* TestDictionaryFactory.swift */,
+				F002F5F2B466B34E2E0018E4 /* VerticalTextLayoutTests.swift */,
 			);
 			path = KanjiScannerTests;
 			sourceTree = "<group>";
@@ -173,6 +178,7 @@
 			children = (
 				F0F7133DEC2F3C6B15504675 /* TextRecognizer.swift */,
 				2EDC1CF09592AB2D5DF42B6A /* TokenBoxBuilder.swift */,
+				EE25F4E33DA8848552018E97 /* VerticalTextLayout.swift */,
 			);
 			path = OCR;
 			sourceTree = "<group>";
@@ -314,6 +320,7 @@
 				01ECE8991836657D2F54CCF6 /* Segmenter.swift in Sources */,
 				761066107619107F25FCD7BB /* TextRecognizer.swift in Sources */,
 				78934D77BB88DE03C87B87AF /* TokenBoxBuilder.swift in Sources */,
+				3DF3701A3F6F4893A7DF09FA /* VerticalTextLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +333,7 @@
 				BEB42108C62C54FDB69B2E02 /* SegmenterTests.swift in Sources */,
 				3E227380E69664D5034BC414 /* SenseGroupingTests.swift in Sources */,
 				C66B59A1DEF54DF36B4433BB /* TestDictionaryFactory.swift in Sources */,
+				47BF52AEE0083C462B27D618 /* VerticalTextLayoutTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
