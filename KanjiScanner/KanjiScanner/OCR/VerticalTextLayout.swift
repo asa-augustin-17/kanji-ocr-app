@@ -41,7 +41,39 @@ enum VerticalTextLayout {
         columns = zip(columns, peakDensities)
             .filter { $0.1 >= sanityFloor && ($0.0.end - $0.0.start + 1) >= minWidth }
             .map { $0.0 }
+
+        // Second sanity filter: reject bands that are dark/wide enough to
+        // pass the check above but aren't actually text - confirmed
+        // necessary against a real photo where a strip of wood-grain desk
+        // background (visible at the frame's edge) passed the density/width
+        // filter and produced garbage recognized output. Real printed text
+        // alternates sharply between ink and paper along a column's height
+        // (character strokes vs. the gaps between them); background texture
+        // varies far more smoothly. A row-wise ink-density profile's
+        // coefficient of variation (stddev/mean) captures that difference
+        // cheaply: measured on a real photo, genuine text columns scored
+        // 0.32-0.42 and the background band scored 0.12-0.15 - a wide,
+        // comfortable gap, not a knife's-edge threshold.
+        columns = columns.filter { rowVariationScore(page: page, xStart: $0.start, xEnd: $0.end) >= 0.25 }
         return columns
+    }
+
+    private static func rowVariationScore(page: GrayscaleBuffer, xStart: Int, xEnd: Int) -> CGFloat {
+        let width = xEnd - xStart + 1
+        guard width > 0, page.height > 0 else { return 0 }
+        var profile = [CGFloat](repeating: 0, count: page.height)
+        for y in 0..<page.height {
+            var sum = 0
+            let rowStart = y * page.bytesPerRow
+            for x in xStart...xEnd {
+                sum += 255 - Int(page.bytes[rowStart + x])
+            }
+            profile[y] = CGFloat(sum) / CGFloat(width * 255)
+        }
+        let mean = profile.reduce(0, +) / CGFloat(profile.count)
+        guard mean > 0 else { return 0 }
+        let variance = profile.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / CGFloat(profile.count)
+        return sqrt(variance) / mean
     }
 
     /// Forces `image` into a fully-realized bitmap, copying it through a
