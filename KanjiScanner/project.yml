@@ -53,10 +53,21 @@ targets:
           set -e
           FRAMEWORKS_PATH="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
           for framework in "onnxruntime" "onnxruntime_extensions"; do
-              PLIST="${FRAMEWORKS_PATH}/${framework}.framework/Info.plist"
+              FRAMEWORK_PATH="${FRAMEWORKS_PATH}/${framework}.framework"
+              PLIST="${FRAMEWORK_PATH}/Info.plist"
               if [ -f "$PLIST" ]; then
                   /usr/libexec/PlistBuddy -c "Delete :MinimumOSVersion" "$PLIST" 2>/dev/null || true
                   /usr/libexec/PlistBuddy -c "Add :MinimumOSVersion string ${IPHONEOS_DEPLOYMENT_TARGET}" "$PLIST"
+                  # Patching the Info.plist after Xcode's "Embed Frameworks"
+                  # phase already signed this framework invalidates that
+                  # signature - installd verifies each embedded framework's
+                  # signature independently at install time, so it must be
+                  # re-signed now that the content is final (confirmed via a
+                  # real device install failure: "Failed to verify code
+                  # signature... 0xe8008001" on onnxruntime.framework).
+                  if [ "${CODE_SIGNING_ALLOWED}" = "YES" ]; then
+                      /usr/bin/codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY:--}" --preserve-metadata=identifier,entitlements,flags "$FRAMEWORK_PATH"
+                  fi
               fi
           done
 
