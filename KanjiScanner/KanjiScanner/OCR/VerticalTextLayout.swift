@@ -58,9 +58,40 @@ enum VerticalTextLayout {
         return columns
     }
 
-    private static func rowVariationScore(page: GrayscaleBuffer, xStart: Int, xEnd: Int) -> CGFloat {
+    /// Finds where a single column's own real text starts and ends
+    /// vertically. Every column is otherwise cropped at the full page
+    /// height regardless of how much of that is actually text - fine for a
+    /// long column, but confirmed to badly hurt a short one (a handful of
+    /// characters) against a real photo: most of its crop is blank space
+    /// below the real content, which dilutes the real content down to a
+    /// small fraction of the resized input, and the recognizer was
+    /// dropping most or all of the real text as a result (e.g. a column
+    /// reading "ふと、目が開く。" came back as just "がく" - only the tail).
+    ///
+    /// This is deliberately scoped to one column's own x-range, not the
+    /// whole page: the first vertical-text attempt tried a whole-page
+    /// version of this and found it unreliable when the photo's framing
+    /// included background beyond the page (a different column's ink, or
+    /// no ink at all, at a given row, diluted the shared signal). Confined
+    /// to a single column already isolated by `detectColumns`, there's no
+    /// other column or background to contaminate the profile - just this
+    /// column's own blank paper vs. its own ink.
+    static func textBearingExtent(page: GrayscaleBuffer, xStart: Int, xEnd: Int) -> (top: Int, bottom: Int) {
+        guard page.height > 0 else { return (0, 0) }
+        let profile = columnRowProfile(page: page, xStart: xStart, xEnd: xEnd)
+        let radius = max(2, page.height / 400)
+        let smooth = smoothed(profile, radius: radius)
+        let floor = backgroundFloor(smooth, aboveFraction: 0.12)
+        var top = 0
+        var bottom = smooth.count - 1
+        while top < smooth.count, smooth[top] < floor { top += 1 }
+        while bottom > top, smooth[bottom] < floor { bottom -= 1 }
+        return top <= bottom ? (top, bottom) : (0, page.height - 1)
+    }
+
+    private static func columnRowProfile(page: GrayscaleBuffer, xStart: Int, xEnd: Int) -> [CGFloat] {
         let width = xEnd - xStart + 1
-        guard width > 0, page.height > 0 else { return 0 }
+        guard width > 0, page.height > 0 else { return [] }
         var profile = [CGFloat](repeating: 0, count: page.height)
         for y in 0..<page.height {
             var sum = 0
@@ -70,6 +101,12 @@ enum VerticalTextLayout {
             }
             profile[y] = CGFloat(sum) / CGFloat(width * 255)
         }
+        return profile
+    }
+
+    private static func rowVariationScore(page: GrayscaleBuffer, xStart: Int, xEnd: Int) -> CGFloat {
+        let profile = columnRowProfile(page: page, xStart: xStart, xEnd: xEnd)
+        guard !profile.isEmpty else { return 0 }
         let mean = profile.reduce(0, +) / CGFloat(profile.count)
         guard mean > 0 else { return 0 }
         let variance = profile.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / CGFloat(profile.count)

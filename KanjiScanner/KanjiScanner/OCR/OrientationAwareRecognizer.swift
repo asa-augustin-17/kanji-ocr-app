@@ -24,7 +24,7 @@ extension VerticalTextRecognizer: TextRecognizing {}
 /// actual camera pipeline (not just the scratchpad/Python validation this
 /// feature was built against).
 final class OrientationAwareRecognizer {
-    static var isEnabled = false
+    static var isEnabled = true
 
     /// Below this combined recognized-character count, the horizontal pass
     /// is treated as having found nothing usable - just a stray artifact

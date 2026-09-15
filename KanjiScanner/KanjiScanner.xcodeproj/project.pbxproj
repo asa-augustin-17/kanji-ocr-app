@@ -72,7 +72,7 @@
 		8E6C5AFA0C39B35F111B767E /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		91DDF9FFFC085647B16D0AB3 /* DictionaryDatabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDatabaseTests.swift; sourceTree = "<group>"; };
 		A7169AF8DF1832B6C827BC53 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		A7DCFE97EDE8A3DE0DE716EA /* ppocrv5_rec.onnx */ = {isa = PBXFileReference; path = ppocrv5_rec.onnx; sourceTree = "<group>"; };
+		A7DCFE97EDE8A3DE0DE716EA /* ppocrv5_rec.onnx */ = {isa = PBXFileReference; lastKnownFileType = file; path = ppocrv5_rec.onnx; sourceTree = "<group>"; };
 		B1AEE92F8591A817CA7A8636 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		BC4F04992C727363A23DB12D /* KanjiScanner.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = KanjiScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C78143D9F4F082B453F1BA48 /* OrientationAwareRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrientationAwareRecognizer.swift; sourceTree = "<group>"; };

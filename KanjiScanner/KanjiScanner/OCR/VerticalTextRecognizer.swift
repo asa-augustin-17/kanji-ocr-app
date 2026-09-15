@@ -45,14 +45,22 @@ final class VerticalTextRecognizer {
             let columnWidth = column.end - column.start + 1
             guard columnWidth > 0 else { continue }
 
+            // Trim to where this column's own real text actually is, rather
+            // than blindly using the full page height - see
+            // `textBearingExtent`'s doc comment for why a short column needs
+            // this even though a long one gets away without it.
+            let extent = VerticalTextLayout.textBearingExtent(page: pageBuffer, xStart: column.start, xEnd: column.end)
+            let textHeight = extent.bottom - extent.top + 1
+            guard textHeight > 0 else { continue }
+
             let resizeScale = 48.0 / Double(columnWidth)
-            let wouldBeResizedWidth = Int(Double(pageHeight) * resizeScale)
+            let wouldBeResizedWidth = Int(Double(textHeight) * resizeScale)
             let chunkCount = max(1, Int((Double(wouldBeResizedWidth) / Double(Self.maxResizedWidth)).rounded(.up)))
-            let chunkHeight = Int((Double(pageHeight) / Double(chunkCount)).rounded(.up))
+            let chunkHeight = Int((Double(textHeight) / Double(chunkCount)).rounded(.up))
 
             for chunkIndex in 0..<chunkCount {
-                let yStart = chunkIndex * chunkHeight
-                let yEnd = min(pageHeight, yStart + chunkHeight)
+                let yStart = extent.top + chunkIndex * chunkHeight
+                let yEnd = min(extent.top + textHeight, yStart + chunkHeight)
                 guard yEnd > yStart else { continue }
                 guard let columnCrop = image.cropping(to: CGRect(x: column.start, y: yStart, width: columnWidth, height: yEnd - yStart)) else { continue }
                 // CCW confirmed (not assumed) against a real photographed
